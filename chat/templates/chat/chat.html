@@ -1,0 +1,70 @@
+{% extends 'account/base.html' %}
+{% block title %}Chat | ChatBotApp{% endblock %}
+
+{% block main %}
+<div class="container py-3">
+  <h2 class="text-center mb-3">ChatBot</h2>
+
+    <!-- Chat Display Area -->
+    <div id="chat-box" class="chat-box border rounded p-3 mb-3" style="height: 300px; overflow-y: auto; background-color: whitesmoke;">
+        {% for chat in chats %}
+            <!-- User message -->
+            <div class="d-flex flex-column align-items-end mb-3">
+            <small class="text-muted me-2">You</small>
+            <div class="user-msg px-3 py-2">{{ chat.user_message }}</div>
+            </div>
+
+            <!-- Bot reply -->
+            <div class="d-flex flex-column align-items-start mb-3">
+            <small class="text-muted ms-2">bot</small>
+            {% if forloop.last %}
+                <div class="bot-msg px-3 py-2" id="botTyping" data-reply="{{ chat.bot_reply }}">typing...</div>
+            {% else %}
+                <div class="bot-msg px-3 py-2">{{ chat.bot_reply }}</div>
+            {% endif %}
+            </div>
+        {% empty %}
+            <p>Welcome</p>
+        {% endfor %}
+    </div>
+        <!-- Chat Input Form -->
+    <form action="{% url 'chat:chat' %}" method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label>
+                <span style="color: red;">{{ field.errors }}</span>
+                <p style="font-size: 1.2rem;">{{field}}</p>
+            {% endfor %}
+            <button type="submit" class="btn btn-success px-4" style="float: right;">Send</button>
+    </form>
+</div>
+{% endblock %}
+{% block footer %}
+    <script>
+  window.onload = function() {
+    const chatBox = document.getElementById('chat-box');
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  };
+</script>
+<script>
+  window.onload = function () {
+    const chatBox = document.getElementById('chat-box');
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    const botTypingEl = document.getElementById('botTyping');
+    if (botTypingEl) {
+      const reply = botTypingEl.dataset.reply;
+      setTimeout(() => {
+        botTypingEl.textContent = reply;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 1000); // 1 second typing simulation
+    }
+  };
+</script>
+
+
+{% endblock %}

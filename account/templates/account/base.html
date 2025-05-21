@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AskME{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+  <style>
+    body {
+      padding-top: 70px; /* Prevent content from hiding under the fixed navbar */
+    }
+    .navbar-collapse {
+      transition: height 0.3s ease;
+    }
+    @media (max-width: 768px) {
+      .navbar-nav .nav-link {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+ {% block head %}
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-3">
+    <a class="navbar-brand" href="#">AskME.net</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'account:home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  {% endblock %}
+
+  <!-- Hero Section -->
+  {% block main %} 
+  <header class="py-5 mt-3 text-center bg-light">
+    <div class="container">
+      <h1 class="display-4">Welcome to AskME</h1>
+      <p class="lead">Your intelligent, rule-based chatbot assistant for instant answers.</p>
+      <a href="#chatbox" class="btn btn-primary btn-lg mt-3">Start Chatting</a>
+    </div>
+  </header>
+
+  <!-- How it Works -->
+  <section class="py-5 bg-white text-center">
+    <div class="container">
+      <h2>How It Works</h2>
+      <p class="mb-4">AskME uses a set of pre-defined rules to respond intelligently to your questions.</p>
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Step 1</h5>
+          <p>Type a question or message into the chat interface.</p>
+        </div>
+        <div class="col-md-4">
+          <h5>Step 2</h5>
+          <p>Our chatbot matches your input with rule-based logic.</p>
+        </div>
+        <div class="col-md-4">
+          <h5>Step 3</h5>
+          <p>Get instant and accurate replies—tailored to your request!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample Questions -->
+  <section class="py-5 bg-light text-center">
+    <div class="container">
+      <h2>Try Asking:</h2>
+      <ul class="list-unstyled">
+        <li>✔ What is AskME?</li>
+        <li>✔ How does this chatbot work?</li>
+        <li>✔ Who built this platform?</li>
+        <li>✔ Can I reset my password?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="py-5 text-center bg-white">
+    <div class="container">
+      <h2>About AskME</h2>
+      <p>AskME is a rule-based chatbot built with Django and Django REST Framework. It's designed to offer quick and precise answers to user queries based on predefined conditions—ideal for help desks, customer support, and information portals.</p>
+    </div>
+  </section>
+
+  <!-- Main Content Block -->
+  <div class="container my-5" id="chatbox">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Floating Chat Icon -->
+  <a href="{% url 'chat:chat'%}" class="chat-icon" title="Chat with us">💬</a>
+  {% endblock %}
+
+  <!-- Footer -->
+  {% block footer %} 
+  <footer class="bg-dark text-light py-4 text-center">
+    <div class="container">
+      <p class="mb-0">&copy; 2025 AskME.net. All rights reserved.</p>
+    </div>
+  </footer>
+    
+  <script>
+    const chatInput = document.getElementById("chatInput");
+    if (chatInput) {
+      chatInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 150) + "px";
+      });
+    }
+  </script>
+
+  <!-- Bootstrap Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  {% endblock %}
+</body>
+</html>

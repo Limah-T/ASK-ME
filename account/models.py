@@ -20,10 +20,10 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, username, email, country, role, password=None, **extra_fields):
+    def create_superuser(self, username, email, country, password=None, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('role', 'developer')
+        role = "developer"
         return self.create_user(username=username, email=email, country=country, role=role, password=password, **extra_fields)
     
 class CustomUser(AbstractUser):
@@ -52,14 +52,4 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-class Chat(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="chats")
-    user_message = models.TextField()
-    bot_reply = models.TextField()
-    time_stamp = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        self.user_message = self.user_message.strip().lower()
-        self.bot_reply = self.bot_reply.strip().lower()
-        super().save(*args, **kwargs)
