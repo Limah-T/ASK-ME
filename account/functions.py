@@ -40,7 +40,7 @@ def send_token_for_email_verification(user):
                         )
     msg = EmailMultiAlternatives(
         subject=SUBJECT,
-        from_email="limahtechnology@yahoo.com",
+        from_email=os.getenv("EMAIL_HOST_USER"),
         to=[user]
     )
     msg.attach_alternative(content=html_content, mimetype="text/html")

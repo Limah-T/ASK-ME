@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
-from account.models import CustomUser
 from .models import Chat
 from django.views import View
 from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat
 from .form import QuestionNDbotReply
 
-class ChatBotView(View):
+class ChatBotView(LoginRequiredMixin, View):
     template_name = "chat/chat.html"
     form_class = QuestionNDbotReply
 
@@ -22,7 +22,7 @@ class ChatBotView(View):
 
             # Simulate bot reply (you can replace with real logic)
             # greeting
-            if user_message.lower() in ["hi", "hello", "hey"]:
+            if "hello" in user_message.lower():
                 bot_reply = "👋 Hello! How can I help you today?"
 
             elif "any news" in user_message.lower():
@@ -50,7 +50,7 @@ class ChatBotView(View):
                 )
             # who created askme
             elif "who created" in user_message.lower() or "who built" in user_message.lower():
-                bot_reply = "AskME was developed by a talented team of Django developer. It's designed to be simple, fast, and helpful!"
+                bot_reply = "AskME was developed by a talented team of Django developers, the founder named 'Halimah Temitope'. It's designed to be simple, fast, and helpful!"
             # reset password
             elif "reset password" in user_message.lower():
                 bot_reply = "To reset your password, please go to the login page and click on 'Forgot Password'. A reset link will be sent to your email."
@@ -65,9 +65,8 @@ class ChatBotView(View):
             else:
                 bot_reply = "🤔 I'm not sure how to respond to that. Try rephrasing or ask for 'help'."
 
-            user = CustomUser.objects.get(username="limah")
             # Save chat to DB
-            Chat.objects.create(user=user, user_message=user_message, bot_reply=bot_reply)
+            Chat.objects.create(user=request.user, user_message=user_message, bot_reply=bot_reply)
 
             return redirect("chat:chat")  # Adjust name to match your URL
         chats = Chat.objects.order_by("time_stamp")

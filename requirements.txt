@@ -4,3 +4,4 @@
 # pip install mysqlclient
 # pip install PYJWT
 # pip install cryptography
+# pip install django-two-factor-auth

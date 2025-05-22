@@ -13,15 +13,23 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    # built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # custom apps
     'chat',
     'api',
     'account',
+    'home',
+    # third party apps
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_email',  # <- if you want email capability.
 ]
 
 MIDDLEWARE = [
@@ -30,6 +38,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # two factor authentication OTP
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -103,4 +113,4 @@ EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 
 # Authentication routes
-LOGIN_URL = "/accounts/signup/"
+LOGIN_URL = "/account/login/"
