@@ -1,0 +1,13 @@
+{% extends 'account/base.html' %}
+{% block title %}Email Verification Failed{% endblock %}
+{% block main %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="text-center">
+        <h1 class="text-danger">Invalid Request</h1>
+        <p>Sorry, the request you're trying to make is invalid</p>
+       
+        <a href="{% url 'home:home'%}" class="btn btn-secondary mt-3">Home</a>
+    </div>
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}

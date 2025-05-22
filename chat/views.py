@@ -1,14 +1,6 @@
 from django.shortcuts import render, redirect
-from django.views.generic.base import TemplateView
-from django.views.generic.edit import FormView
-from django.http import HttpResponse
-from django.urls import reverse_lazy
-from django.contrib import messages
-from django.views.generic import ListView
 from account.models import CustomUser
-from . import form
 from .models import Chat
-
 from django.views import View
 from django.shortcuts import render, redirect
 from .models import Chat

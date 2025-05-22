@@ -1,0 +1,42 @@
+{% extends 'account/base.html'%}
+{% load static %}
+
+{% block title %}SignUp{% endblock %}
+{% block main %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card shadow-lg" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                        <form action="{% url 'account:signup'%}" method="POST">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
+                                {% if field.errors %}
+                                        <div class="text-danger small">
+                                            {{ field.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                {% if field.name == 'password1' or field.name == 'password2' %}
+                                    <div class="position-relative">
+                                        {{ field }}
+                                        <i class="fa-solid fa-eye toggle-password" 
+                                        data-target="{{ field.auto_id }}"
+                                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                                        </i>
+                                    </div>
+                                {% else %}
+                                    <p style="font-size: 1.2rem;">{{field}}</p>
+                                {% endif %}
+                            {% endfor %}
+                            <button type="submit" class="w-100 btn btn-primary">Create an account</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="" style="color: rgb(255, 90, 90); font-weight: 600;">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

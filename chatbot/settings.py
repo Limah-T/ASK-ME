@@ -94,3 +94,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Additional settings
 AUTH_USER_MODEL = "account.CustomUser"
+
+# Email Configuration
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+
+# Authentication routes
+LOGIN_URL = "/accounts/signup/"

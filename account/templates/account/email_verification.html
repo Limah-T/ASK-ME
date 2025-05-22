@@ -1,0 +1,24 @@
+{% extends "account/base.html" %}
+{% block title %}Verify Your Email{% endblock %}
+{% block head %}{% endblock %}
+{% block main %}
+<h2 style="color: #333333;">{{ subject }}</h2>
+<p style="font-size: 16px; color: #555555;">
+    Thank you for signing up! Please verify your email address by clicking the button below.
+</p>
+
+<p style="text-align: center; margin: 30px 0;">
+    <a href="{{ VERIFICATION_URL }}"
+       style="display: inline-block; background-color: #007bff; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-size: 16px;">
+        Verify Email
+    </a>
+</p>
+
+<p style="font-size: 14px; color: #999999;">
+    If you did not sign up, you can safely ignore this email.
+</p>
+<span>Thank you,</span><br>
+<span>AskMe.net</span>
+{% endblock %}
+{% block footer %}
+{% endblock %}

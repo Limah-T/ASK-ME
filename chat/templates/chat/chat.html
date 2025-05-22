@@ -6,11 +6,11 @@
   <h2 class="text-center mb-3">ChatBot</h2>
 
     <!-- Chat Display Area -->
-    <div id="chat-box" class="chat-box border rounded p-3 mb-3" style="height: 300px; overflow-y: auto; background-color: whitesmoke;">
+    <div id="chat-box" class="chat-box border rounded p-3 mb-3 px-5" style="height: 300px; overflow-y: auto; background-color: whitesmoke;">
         {% for chat in chats %}
             <!-- User message -->
             <div class="d-flex flex-column align-items-end mb-3">
-            <small class="text-muted me-2">You</small>
+            <small class="text-muted me-2">you</small>
             <div class="user-msg px-3 py-2">{{ chat.user_message }}</div>
             </div>
 
@@ -31,12 +31,15 @@
     <form action="{% url 'chat:chat' %}" method="POST">
             {% csrf_token %}
             {% for field in form %}
-                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label>
+                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
                 <span style="color: red;">{{ field.errors }}</span>
                 <p style="font-size: 1.2rem;">{{field}}</p>
             {% endfor %}
             <button type="submit" class="btn btn-success px-4" style="float: right;">Send</button>
     </form>
+    <a href="">
+      <button type="submit">New chat</button>
+    </a>
 </div>
 {% endblock %}
 {% block footer %}
