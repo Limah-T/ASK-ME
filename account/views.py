@@ -17,7 +17,7 @@ class SignUpView(FormView):
     http_method_names = ["post", "get"]
 
     def post(self, request, *args, **kwargs):
-        CustomUser.objects.all().delete()
+        # CustomUser.objects.all().delete()
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             print(form_rendered.cleaned_data)

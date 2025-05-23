@@ -32,3 +32,4 @@ class LoginForm(forms.Form):
 class OTPForm(forms.Form):
     code = forms.CharField(max_length=os.getenv("LENGTH"), 
                            label="Enter the OTP code below")
+

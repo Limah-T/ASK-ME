@@ -11,6 +11,6 @@ class Chat(models.Model):
 
     def save(self, *args, **kwargs):
         self.user_message = self.user_message.strip()
-        self.bot_reply = self.bot_reply.strip().lower()
+        self.bot_reply = self.bot_reply.strip()
         super().save(*args, **kwargs)
 

@@ -2,27 +2,28 @@
 {% block title %}Chat | ChatBotApp{% endblock %}
 
 {% block main %}
-<div class="container py-3">
-  <h2 class="text-center mb-3">ChatBot</h2>
-
+<div class="container pb-3">
+  <h5 class="text-left mb-3" style="color: green; font-style: italic;">{{user}}'s Bot Assitant</h5>
     <!-- Chat Display Area -->
-    <div id="chat-box" class="chat-box border rounded p-3 mb-3 px-5" style="height: 300px; overflow-y: auto; background-color: whitesmoke;">
+    <div id="chat-box" class="chat-box border rounded p-3 mb-3 px-5" style="height: 400px; overflow-y: auto; background-color: whitesmoke;">
         {% for chat in chats %}
-            <!-- User message -->
-            <div class="d-flex flex-column align-items-end mb-3">
-            <small class="text-muted me-2">you</small>
-            <div class="user-msg px-3 py-2">{{ chat.user_message }}</div>
-            </div>
+          {% if chat.user == user %}
+              <!-- User message -->
+              <div class="d-flex flex-column align-items-end mb-3">
+              <small class="text-muted me-2">you</small>
+              <div class="user-msg px-3 py-2" style="background-color: gray; color: whitesmoke;">{{ chat.user_message }}</div>
+              </div>
 
-            <!-- Bot reply -->
-            <div class="d-flex flex-column align-items-start mb-3">
-            <small class="text-muted ms-2">bot</small>
-            {% if forloop.last %}
-                <div class="bot-msg px-3 py-2" id="botTyping" data-reply="{{ chat.bot_reply }}">typing...</div>
-            {% else %}
-                <div class="bot-msg px-3 py-2">{{ chat.bot_reply }}</div>
-            {% endif %}
-            </div>
+              <!-- Bot reply -->
+              <div class="d-flex flex-column align-items-start mb-3">
+              <small class="text-muted ms-2">bot</small>
+              {% if forloop.last %}
+                  <div class="bot-msg px-3 py-2" id="botTyping" data-reply="{{ chat.bot_reply }}">typing...</div>
+              {% else %}
+                  <div class="bot-msg px-3 py-2">{{ chat.bot_reply }}</div>
+              {% endif %}
+              </div>
+          {% endif %}
         {% empty %}
             <p>Welcome</p>
         {% endfor %}

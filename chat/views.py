@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat
 from .form import QuestionNDbotReply
+from .wiki_api import wikipedia_api
 
 class ChatBotView(LoginRequiredMixin, View):
     template_name = "chat/chat.html"
@@ -63,8 +64,8 @@ class ChatBotView(LoginRequiredMixin, View):
                 bot_reply = "You're welcome! 😊 Let me know if there's anything else I can help you with."
 
             else:
-                bot_reply = "🤔 I'm not sure how to respond to that. Try rephrasing or ask for 'help'."
-
+                bot_reply = wikipedia_api(user_question=user_message.lower())
+                
             # Save chat to DB
             Chat.objects.create(user=request.user, user_message=user_message, bot_reply=bot_reply)
 
