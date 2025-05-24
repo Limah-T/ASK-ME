@@ -1,74 +1,45 @@
 {% extends 'account/base.html' %}
 {% block title %}Chat | ChatBotApp{% endblock %}
-
+{% load static %}
 {% block main %}
-<div class="container pb-3">
-  <h5 class="text-left mb-3" style="color: green; font-style: italic;">{{user}}'s Bot Assitant</h5>
-    <!-- Chat Display Area -->
-    <div id="chat-box" class="chat-box border rounded p-3 mb-3 px-5" style="height: 400px; overflow-y: auto; background-color: whitesmoke;">
-        {% for chat in chats %}
-          {% if chat.user == user %}
-              <!-- User message -->
-              <div class="d-flex flex-column align-items-end mb-3">
-              <small class="text-muted me-2">you</small>
-              <div class="user-msg px-3 py-2" style="background-color: gray; color: whitesmoke;">{{ chat.user_message }}</div>
-              </div>
-
-              <!-- Bot reply -->
-              <div class="d-flex flex-column align-items-start mb-3">
-              <small class="text-muted ms-2">bot</small>
-              {% if forloop.last %}
-                  <div class="bot-msg px-3 py-2" id="botTyping" data-reply="{{ chat.bot_reply }}">typing...</div>
-              {% else %}
-                  <div class="bot-msg px-3 py-2">{{ chat.bot_reply }}</div>
-              {% endif %}
-              </div>
-          {% endif %}
-        {% empty %}
-            <p>Welcome</p>
-        {% endfor %}
+<div class="container">
+  <div class="chat-wrapper">
+    <div class="chat-header">{{ user }}'s Bot Assistant</div>
+    <div id="chat-box" class="chat-box">
+      {% for chat in chats %}
+        {% if chat.user == user %}
+          <div class="chat-message user">{{ chat.user_message }}
+            <div class="chat-timestamp">you • {{ chat.created_at|timesince }} ago</div>
+          </div>
+          <div class="chat-message bot">
+            {% if forloop.last %}
+              <span id="botTyping" data-reply="{{ chat.bot_reply }}">Typing...</span>
+            {% else %}
+              {{ chat.bot_reply }}
+            {% endif %}
+            <div class="chat-timestamp">bot • {{ chat.created_at|timesince }} ago</div>
+          </div>
+        {% endif %}
+      {% empty %}
+        <p>Welcome to your assistant chat</p>
+      {% endfor %}
     </div>
-        <!-- Chat Input Form -->
-    <form action="{% url 'chat:chat' %}" method="POST">
-            {% csrf_token %}
-            {% for field in form %}
-                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
-                <span style="color: red;">{{ field.errors }}</span>
-                <p style="font-size: 1.2rem;">{{field}}</p>
-            {% endfor %}
-            <button type="submit" class="btn btn-success px-4" style="float: right;">Send</button>
-    </form>
-    <a href="">
-      <button type="submit">New chat</button>
-    </a>
+    <div class="chat-input">
+      <form action="{% url 'chat:chat' %}" method="POST" class="d-flex">
+        {% csrf_token %}
+        {% for field in form %}
+              <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
+              {% if field.errors %}
+                      <div class="text-danger small">
+                          {{ field.errors.0 }}
+                      </div>
+              {% endif %}
+              {{ field }}
+          {% endfor %}
+        <button type="submit" class="btn" style="background-color: #285963; color: whitesmoke; height: 3rem; font-weight: bold;">Send</button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
-{% block footer %}
-    <script>
-  window.onload = function() {
-    const chatBox = document.getElementById('chat-box');
-    if (chatBox) {
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  };
-</script>
-<script>
-  window.onload = function () {
-    const chatBox = document.getElementById('chat-box');
-    if (chatBox) {
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    const botTypingEl = document.getElementById('botTyping');
-    if (botTypingEl) {
-      const reply = botTypingEl.dataset.reply;
-      setTimeout(() => {
-        botTypingEl.textContent = reply;
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }, 1000); // 1 second typing simulation
-    }
-  };
-</script>
-
-
-{% endblock %}
+{% block footer %}{% endblock %}

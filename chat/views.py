@@ -23,10 +23,10 @@ class ChatBotView(LoginRequiredMixin, View):
 
             # Simulate bot reply (you can replace with real logic)
             # greeting
-            if "hello" in user_message.lower():
+            if user_message.lower == "hello":
                 bot_reply = "👋 Hello! How can I help you today?"
 
-            elif "any news" in user_message.lower():
+            if "any news" in user_message.lower():
                 bot_reply = (
                     "Sure! Here's the latest update:\n\n"
                     "- 📰 Our new AI-powered helpdesk feature is now live!\n"
@@ -50,8 +50,8 @@ class ChatBotView(LoginRequiredMixin, View):
                     "I'm always here to help you explore!"
                 )
             # who created askme
-            elif "who created" in user_message.lower() or "who built" in user_message.lower():
-                bot_reply = "AskME was developed by a talented team of Django developers, the founder named 'Halimah Temitope'. It's designed to be simple, fast, and helpful!"
+            elif "who developed askme" in user_message.lower():
+                bot_reply = "AskME was developed by a talented Django developer, named 'Halimah Temitope'. It's designed to be simple, fast, and helpful!"
             # reset password
             elif "reset password" in user_message.lower():
                 bot_reply = "To reset your password, please go to the login page and click on 'Forgot Password'. A reset link will be sent to your email."
