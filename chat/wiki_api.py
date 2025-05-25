@@ -35,7 +35,6 @@ def wikipedia_api(user_question):
     response = requests.request("POST", url, headers=headers, data=payload)
 
     data = response.json()
-    print(len(data))
 
     try: 
         results = ""
@@ -43,7 +42,6 @@ def wikipedia_api(user_question):
         context = data["organic"][:]
         for n in context:
             results += f"{n['snippet']}\n"
-            print(results)
     except Exception as e:
         print(e)
         return "Sorry, can you ask of something more different, with detailed question"
