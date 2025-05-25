@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from account.models import CustomUser
 from account.country_names import COUNTRY_CHOICES, DEFAULT_ROLE
+from django.contrib.auth import authenticate
 
 class ChoiceFieldCustomSerializer(serializers.ChoiceField):
     def to_internal_value(self, data):
@@ -37,5 +38,18 @@ class SignUpSerializer(serializers.Serializer):
         user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
         return user
         
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(trim_whitespace=True)
+    password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
+
+    def validate(self, data):
+        if not CustomUser.objects.filter(email=data['email']).exists():
+            pass
+        user = authenticate(email=data['email'], password=data['password'])
+        print(user, "user from serializer class")
+        if user:
+            return user
+        raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
+         
 
 

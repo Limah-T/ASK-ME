@@ -76,12 +76,12 @@ class EmailOTP(Device):
                                                 )
         super().save(*args, **kwargs)
 
-    def send_otp_to_email(self):
+    def send_otp_to_email(self, app_name):
         SUBJECT = "OTP Code"
         OTP = self.otp_code
-
+        print(OTP, "otp")
         html_content = render_to_string(
-                                template_name="account/otp_email.html",
+                                template_name=f"{app_name}/otp_email.html",
                                 context={
                                     "OTP":OTP,
                                     "subject":SUBJECT

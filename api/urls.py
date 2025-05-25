@@ -5,5 +5,8 @@ app_name = "api"
 urlpatterns = [
     path('v1/signup/', views.SignUpView.as_view()),
     path('v1/verify-email/', views.VerifyEmailView.as_view()),
-    
+    path('v1/login/', views.LoginView.as_view()),
+    path('v1/verify-code/', views.VerifyOtpView.as_view()),
+    path('v1/logout/', views.LogoutView.as_view()),
+
 ]

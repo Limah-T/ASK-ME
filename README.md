@@ -40,10 +40,15 @@ SERPER_API_KEY=your-serper-api-key
 Endpoint                                Method     Action
 /api/v1/signup/	                        POST	   Register new user
 /api/v1/verify-email?token=token        GET        Verify email via Token
+/api/v1/login/                          POST       Login with valid credentials
+/api/v1/verify-code/                    POST       Verify OTP code
+/api/v1/logout/                         POST       Logout with valid token place in the header
 
 
 # 📝 Signup Endpoint Details
-POST /api/v1/signup/
+Endpoint: POST /api/v1/signup/
+Description:
+Signs in user with validated credentials, then sends email for verification.
     Request Body  {
                     "email": "your-email",
                     "username": "your-email",
@@ -73,6 +78,63 @@ POST /api/v1/signup/
         # Error (HTTP 400):
             {
                 "error": "Invalid or Expired token."
+            }
+
+# 📝 Login Endpoint Details
+Description:
+Validates credentials, then sends OTP Code to email for verification.
+Endpoint: POST /api/v1/login/
+    Request Body
+                {
+                    "email": "your-email",
+                    "password": "your-password"
+                }
+    Responses
+    # Success (HTTP 200):
+        {
+        "message": "Please check your email for an OTP code."
+        }
+    # Error (HTTP 400):
+        {
+        "error": "Email or password is incorrect."
+        }
+    Action => Verify OTP Code
+    📧✅ OTP verification required (Code expires in 5mins time)
+    POST /api/v1/verify-code/
+    Request Body
+                {
+                    "email": "your-email",
+                    "code": "code-sent-to-email"
+                }
+    Responses
+        # Success (HTTP 200):
+            {
+                "success": "Code Accepted.",
+                "token": "token-key"
+            }
+        # Error (HTTP 400):
+            {
+                "error": "Invalid or Expired token."
+            }
+
+# 🔒 Logout Endpoint Details
+Endpoint: POST /api/v1/logout/
+
+Description:
+Logs out the authenticated user by pass the valid token in the header.
+
+    Header
+        Authorization: Bearer <your-auth-token>
+    Request Body:
+        No body required.
+    Responses:
+        # Success (HTTP 200)
+            {
+                "success": "Successfully logged out."
+            }
+        # Error (HTTP 400)
+            {
+                "error": "Authentication credentials were not provided."
             }
 
 🧪 Testing

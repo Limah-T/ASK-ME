@@ -82,7 +82,7 @@ class LoginView(FormView):
                 user.save()
                 EmailOTP.objects.all().delete()
                 get_otp_for_user = EmailOTP.objects.create(user=user)
-                get_otp_for_user.send_otp_to_email()
+                get_otp_for_user.send_otp_to_email(app_name="account")
                 form_otp = form.OTPForm()
                 return render(request, "account/otp_input.html", {'form':form_otp, 'uid':user.id})
         return redirect(reverse_lazy("account:login"))
