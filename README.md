@@ -6,7 +6,7 @@ Built using Django Rest Framework, the goal of this project is to offer a robust
 
 🚀 Features
 
-✅ User Registration & Login
+✅ User Registration, Login & Logout
 ✅ JWT Authentication
 ✅ Smart Chatbot Interaction via Serper API
 ✅ Input Validation & Error Handling
