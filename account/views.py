@@ -1,15 +1,23 @@
 from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import timezone
-from .functions import send_token_for_email_verification, decode_token
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import forms
+from django.contrib.auth import views
+from django.contrib.auth.hashers import make_password
+from dotenv import load_dotenv
+from .functions import send_token_for_email_verification, decode_token, send_token_for_password_reset
 from .country_names import DEFAULT_ROLE
 from .models import CustomUser, EmailOTP
 from . import form
+from django.http import HttpResponse
+import os
+
+load_dotenv(override=True)
 
 class SignUpView(FormView):
     template_name = "account/signup.html"
@@ -129,13 +137,93 @@ class VerifyOTP(FormView):
                 user.save()
                 return redirect(reverse_lazy("chat:chat"))
         return redirect(reverse_lazy("account:get_code", kwargs={'uid':user_id}))
-        
+       
+class ForgetPasswordView(FormView):
+    template_name = "account/forget_password.html"
+    form_class = form.CustomForgetPasswordForm
+    http_method_names = ['get', 'post']
+
+    def post(self, request, *args, **kwargs):
+        form_rendered = self.get_form(self.form_class)
+        if form_rendered.is_valid():
+            email = form_rendered.cleaned_data.get('email')
+            try:
+                user_exist = CustomUser.objects.get(email=email)
+                user_exist.token_verified = False
+                user_exist.save()
+                send_token_for_password_reset(user=user_exist.email)
+                return render(request, "account/email_alert.html", {'username': user_exist.username, 'email': email})
+            except Exception as e:
+                print(e)
+                return render(request, "account/email_alert.html", {'username': '', 'email': email})         
+        return super().post(request, *args, **kwargs)
+
+def verify_password_reset_link(request):
+    if request.method == 'GET':
+        token = request.GET.get("token")
+        print("token", token)
+        if not token:
+            return render(request, "account/error_message.html")
+        decoded_token = decode_token(token=token)
+        if not decoded_token:
+            return render(request, "account/failed_verification.html")
+        email = decoded_token['sub']
+        try:
+            user = CustomUser.objects.get(email=email)
+        except Exception as e:
+            print(e)
+            return render(request, "account/failed_verification.html")
+        if not user.email_verified:
+            print("user email not verified")
+            return render(request, "account/failed_verification.html")
+        if user.token_verified:
+            print("user token is verified already")
+            return render(request, "account/failed_verification.html")
+        user.token_verified = True
+        user.save()
+        print(user.id)
+        return redirect(reverse("account:reset_password", kwargs={'uid': user.id}))
+    
+class ResetPasswordView(FormView):
+    template_name = "account/reset_password.html"
+    form_class = form.CustomSetPasswordForm
+    http_method_names = ['get', 'post']
+    success_url = reverse_lazy("chat:chat")
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            print(kwargs['uid'])
+            self.user = CustomUser.objects.get(id=kwargs['uid'])
+        except Exception as e:
+            print("An error ocurred: ", e)
+            return render(request, "account/failed_verification.html")
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['uid'] = self.user.id
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        form_rendered = self.get_form(self.form_class)
+        if form_rendered.is_valid():
+            new_password = form_rendered.cleaned_data.get('new_password')
+            print(new_password, "password")
+            same_password = authenticate(email=self.user.email, password=new_password)
+            if same_password:
+                messages.error(request, message="New password cannot be thesame as old password")
+                return redirect(reverse_lazy('account:reset_password', kwargs={'uid': self.user.id})) 
+            self.user.password = make_password(password=new_password)
+            self.user.save()
+            login(request, user=self.user)
+            messages.success(request, message="Password changed successfully.")
+            return redirect(reverse_lazy("chat:chat"))
+        return super().post(request, *args, **kwargs)
+         
 @login_required(login_url=reverse_lazy("account:login"))
 def logoutView(request):
-    user = request.user
-    print(type(user))
-    user.token_verified = False
-    user.save()
+    request.user.token_verified = False
+    request.user.save()
     logout(request)
     messages.success(request, message="Successfully logged out")
     return redirect(reverse_lazy("account:login"))

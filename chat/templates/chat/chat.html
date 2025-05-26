@@ -4,6 +4,17 @@
 {% block main %}
 <div class="container">
   <div class="chat-wrapper">
+    {% if messages %}
+      {% for message in messages %}
+          {% if message.tags == 'error' %}
+              <p style="background-color: red; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+          {% elif message.tags == 'success' %}
+              <p style="background-color: green; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+          {% elif message.tags == 'info' %}
+              <p style="background-color: yellow; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+          {% endif %}
+      {% endfor %}
+      {% endif %}
     <div class="chat-header">{{ user }}'s Bot Assistant</div>
     <div id="chat-box" class="chat-box">
       {% for chat in chats %}
