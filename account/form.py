@@ -53,10 +53,16 @@ class CustomSetPasswordForm(forms.Form):
         cleaned_data.pop('new_password2')
         return cleaned_data
     
-class CustomForgetPassword(PasswordChangeForm):
+class CustomChangePassword(forms.Form):
     old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     new_password1 = forms.CharField(min_length=8, max_length=255, 
                                     widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="New password")
     new_password2 =forms.CharField(min_length=8, max_length=255, 
                                    widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="Confirm password")
     
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('new_password1') != cleaned_data.get('new_password2'):
+            raise ValidationError('Password do not match.')
+        cleaned_data.pop('new_password2')
+        return cleaned_data

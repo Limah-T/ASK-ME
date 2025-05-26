@@ -11,5 +11,6 @@ urlpatterns = [
     path('forget_password/', views.ForgetPasswordView.as_view(), name='forget_password'),
     path('password-reset', views.verify_password_reset_link),
     path('reset_password/<uuid:uid>/', views.ResetPasswordView.as_view(), name='reset_password'),
+    path('change_password/', views.ChangePasswordView.as_view(), name='change_password'),
     path('logout/', views.logoutView, name='logout')
 ]

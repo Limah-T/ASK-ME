@@ -88,11 +88,13 @@ class LoginView(FormView):
             else:
                 user.token_verified=False
                 user.save()
-                EmailOTP.objects.all().delete()
+                # If user has any otp generated before now
+                EmailOTP.objects.filter(user=user).delete()
                 get_otp_for_user = EmailOTP.objects.create(user=user)
-                get_otp_for_user.send_otp_to_email(app_name="account")
-                form_otp = form.OTPForm()
-                return render(request, "account/otp_input.html", {'form':form_otp, 'uid':user.id})
+                if get_otp_for_user.send_otp_to_email(app_name="account"):
+                    form_otp = form.OTPForm()
+                    return render(request, "account/otp_input.html", {'form':form_otp, 'uid':user.id})
+                messages.error(request, message="Sorry, the network is quite bad st the moment, please try again later.")
         return redirect(reverse_lazy("account:login"))
     
 class VerifyOTP(FormView):
@@ -219,6 +221,34 @@ class ResetPasswordView(FormView):
             messages.success(request, message="Password changed successfully.")
             return redirect(reverse_lazy("chat:chat"))
         return super().post(request, *args, **kwargs)
+    
+class ChangePasswordView(LoginRequiredMixin, FormView):
+    login_url = reverse_lazy("account:login")
+    template_name = "account/change_password.html"
+    form_class = form.CustomChangePassword
+    http_method_names = ['get', 'post']
+
+    def post(self, request, *args, **kwargs):
+        form_rendered = self.get_form(self.form_class)
+        if form_rendered.is_valid():
+            print(form_rendered.cleaned_data)
+            old_password = form_rendered.cleaned_data.get('old_password')
+            new_password = form_rendered.cleaned_data.get('new_password1')
+            confirm_old_password = authenticate(email=request.user.email, password=old_password)
+            # checks if old password is correct
+            if not confirm_old_password:
+                messages.error(request, message="Your old password is incorrect.")
+            else:
+                same_old_password = authenticate(email=request.user.email, password=new_password)
+                if same_old_password:
+                    messages.error(request, message="New password cannot be thesame as old password.")
+                else:
+                    request.user.password = make_password(password=new_password)
+                    request.user.save()
+                    messages.success(request, message="Password changed successfully.")
+                    login(request, request.user)
+                    return redirect(reverse_lazy("chat:chat"))
+        return redirect(reverse_lazy("account:change_password"))
          
 @login_required(login_url=reverse_lazy("account:login"))
 def logoutView(request):

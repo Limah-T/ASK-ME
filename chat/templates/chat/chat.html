@@ -15,7 +15,10 @@
           {% endif %}
       {% endfor %}
       {% endif %}
-    <div class="chat-header">{{ user }}'s Bot Assistant</div>
+    <div class="chat-header">
+      {{ user }}'s Bot Assistant
+      <a href="{% url 'account:change_password' %}">Change password</a>
+    </div>
     <div id="chat-box" class="chat-box">
       {% for chat in chats %}
         {% if chat.user == user %}
