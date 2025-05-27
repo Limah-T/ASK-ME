@@ -10,7 +10,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from datetime import timedelta
 from dotenv import load_dotenv
-from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer
+from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 import os
@@ -32,7 +32,7 @@ class SignUpView(views.APIView):
         print(user)
         if send_token_for_email_verification(user=user.email):
             return Response(data={'message': 'Registration successful. Please check your email to verify your account.'}, status=status.HTTP_200_OK)
-        return Response(data={'error': 'Error occured while sending email'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={'error': 'Error occured while sending for verification.'}, status=status.HTTP_400_BAD_REQUEST)
     
 class VerifyEmailView(views.APIView):
     authentication_classes = []
@@ -157,7 +157,7 @@ class ForgetPasswordView(views.APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         if not send_token_for_password_reset(user=email):
-            return Response(data={'error': 'Error occured while sending OTP to email'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Error occured while sending code to email'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(data={'message': 'Please check you email for confirmation to reset password.'}, status=status.HTTP_200_OK)
 
 class VerifyPasswordResetToken(views.APIView):
@@ -174,7 +174,7 @@ class VerifyPasswordResetToken(views.APIView):
             return Response(data={'error': 'Token is missing from the query params.'}, status=status.HTTP_400_BAD_REQUEST)
         decoded_token = decode_token(token=token)
         if not decoded_token:
-            return Response(data={'error':'Invalid or Expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error':'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
         email = decoded_token['sub']
         try:
             user = CustomUser.objects.get(email=email)
@@ -210,7 +210,7 @@ class ResetPasswordView(views.APIView):
         password = serializer.validated_data.get('new_password')
         user = CustomUser.objects.get(email=email)
         if authenticate(email=user.email, password=password):
-            return Response(data={'error': 'New password cannot be thesame as old.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'New password password to similar.'}, status=status.HTTP_400_BAD_REQUEST)
         user.password = make_password(password=password)
         user.reset_token = False
         user.save()
@@ -221,7 +221,29 @@ class ResetPasswordView(views.APIView):
                                 'success': 'Password has been changed successfully.',
                                 'token': token.key
                             }, status=status.HTTP_200_OK)
+    
+class ChangePasswordView(views.APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["post"]
 
+    def post(self, request):
+        length_of_data = len(request.data)
+        if length_of_data > 3 or length_of_data < 3:
+            return Response(data={'error': 'Only old_password, new_password, and confirm_password are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        old_password = serializer.validated_data.get('old_password')
+        new_password = serializer.validated_data.get('new_password')
+        user = request.user
+        if not authenticate(email=user.email, password=old_password):
+            return Response(data={'error': 'Recent password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+        if authenticate(email=user.email, password=new_password):
+            return Response(data={'error': 'New password is too similar to the old password.'}, status=status.HTTP_400_BAD_REQUEST)
+        user.password = make_password(password=new_password)
+        user.save()
+        return Response(data={'success': 'Your password has been changed successfully.'}, status=status.HTTP_200_OK)
+        
 class LogoutView(views.APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

@@ -37,13 +37,16 @@ ALLOWED_HOSTS=127.0.0.1,localhost
 SERPER_API_KEY=your-serper-api-key
 
 📍 API Endpoints (Overview)
-Endpoint                                Method     Action
-/api/v1/signup/	                        POST	   Register new user
-/api/v1/verify-email?token=token        GET        Verify email via Token
-/api/v1/login/                          POST       Login with valid credentials
-/api/v1/verify-code/                    POST       Verify OTP code
-/api/v1/logout/                         POST       Logout with valid token place in the header
-
+# Endpoint                                Method     Action
+/api/v1/signup/	                        POST	   Register new user.
+/api/v1/verify-email?token=token        GET        Verifies email via Token.
+/api/v1/login/                          POST       Login with valid credentials.
+/api/v1/verify-code/                    POST       Verifies OTP code.
+/api/v1/forget-password/                POST       Enables password reset,and send code.
+/api/v1/verify-reset-code/              GET       Verifies code to reset password.
+/api/v1/password-reset/                 POST       Resets and saves new password.
+/api/v1/change-password/                POST       Verifies old password & change to new
+/api/v1/logout/                         POST       Logout user with valid token.
 
 # 📝 Signup Endpoint Details
 Endpoint: POST /api/v1/signup/
@@ -62,10 +65,10 @@ Signs in user with validated credentials, then sends email for verification.
         }
     # Error (HTTP 400):
         {
-        "error": "detail will be displayed here."
+        "error": "Error occured while sending for verification."
         }
     Action => Verify new user
-    📧✅ Email verification required (Token expires in 5mins time)
+    📧✅ Email verification required (Token expires in 5mins)
     GET /api/v1/verify-email?token=token
     Query parameter 
         • token – the verification token sent to the user's email
@@ -75,7 +78,7 @@ Signs in user with validated credentials, then sends email for verification.
                 "success": "Email verified successfully.",
                 "token": "token-key"
             }
-        # Error (HTTP 400):
+        # Error (HTTP 400): (Code expires after 5mins.)
             {
                 "error": "Invalid or Expired token."
             }
@@ -99,7 +102,7 @@ Endpoint: POST /api/v1/login/
         "error": "Email or password is incorrect."
         }
     Action => Verify OTP Code
-    📧✅ OTP verification required (Code expires in 5mins time)
+    📧✅ OTP verification required 
     POST /api/v1/verify-code/
     Request Body
                 {
@@ -112,10 +115,81 @@ Endpoint: POST /api/v1/login/
                 "success": "Code Accepted.",
                 "token": "token-key"
             }
-        # Error (HTTP 400):
+        # Error (HTTP 400): (Code expires after 5mins.)
             {
                 "error": "Invalid or Expired token."
             }
+
+# 🔁 Forget password Endpoint Details
+Description:
+Validates user's email, then sends code to email for verification, verifies and reset password.
+Endpoint: POST /api/v1/forget-password/
+    Request Body
+                {
+                    "email": "your-email",
+                }
+    Responses
+    # Success (HTTP 200):
+        {
+        "message": "Please check you email for confirmation to reset password."
+        }
+    # Error (HTTP 400):
+        {
+        "error": "Error occured while sending code to email"
+        }
+
+    🔢 Verifies token
+    Endpoint: GET /api/v1/verify-reset-code/ 
+    Query parameter 
+        • token – the verification token sent to the user's email
+    Responses
+        # Success (HTTP 200):
+            {
+               'success': 'Token is valid, you can reset your password now.',
+            }
+        # Error (HTTP 400): (Code expires after 5mins)
+            {
+                "error": "Invalid or expired token."
+            }
+
+    📧 Reset password
+    Endpoint: POST /api/v1/password-reset/
+    Request Body
+                {
+                    "email": "your-email",
+                    "new_password": "your-new-password",
+                    "confirm_password": "confirm-password"
+                }
+    Responses
+        # Success (HTTP 200):
+            {
+               'success': 'Password has been changed successfully.',
+               'token': 'your-token-key'
+            }
+        # Error (HTTP 400) (timeout after 3mins):
+            {
+                "error": "Timeout, request for a new reset token."
+            }
+
+# 🔒 Change password Endpoint Details
+Description:
+Validates authenticated user's old and new password, then change to the new password.
+Endpoint: POST /api/v1/change-password/
+    Request Body
+                {
+                    "old_password": "your-recent-password",
+                    "new_password": "your-new-password",
+                    "confirm_password": "confirm-password"
+                }
+    Responses
+    # Success (HTTP 200):
+        {
+        "success": "Your password has been changed successfully."
+        }
+    # Error (HTTP 400):
+        {
+        "error": "Recent password is incorrect."
+        }
 
 # 🔒 Logout Endpoint Details
 Endpoint: POST /api/v1/logout/

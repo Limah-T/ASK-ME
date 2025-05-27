@@ -44,14 +44,18 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
 
     def validate(self, data):
-        if not CustomUser.objects.filter(email=data['email']).exists():
-            pass
+        try:
+            user_exist = CustomUser.objects.get(email=data['email'])
+        except Exception as e:
+            return None
+        if user_exist.token_verified:
+            raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
         user = authenticate(email=data['email'], password=data['password'])
         print(user, "user from serializer class")
-        if user:
-            return user
-        raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
-         
+        if not user: 
+            raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
+        return user
+    
 class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
 
@@ -72,8 +76,8 @@ class ForgetPasswordSerializer(serializers.Serializer):
     
 class SetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
-    new_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True,)
-    confirm_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True,)
+    new_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
+    confirm_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
 
     def validate(self, data):
         if len(data) > 3 or len(data) < 3:
@@ -96,4 +100,13 @@ class SetPasswordSerializer(serializers.Serializer):
         data.pop('confirm_password')
         return data
     
-        
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(trim_whitespace=True)
+    new_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
+    confirm_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
+
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError({'error': 'Passwords do not match.'})
+        data.pop('confirm_password')
+        return data
