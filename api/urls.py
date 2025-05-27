@@ -7,6 +7,9 @@ urlpatterns = [
     path('v1/verify-email/', views.VerifyEmailView.as_view()),
     path('v1/login/', views.LoginView.as_view()),
     path('v1/verify-code/', views.VerifyOtpView.as_view()),
+    path('v1/forget-password/', views.ForgetPasswordView.as_view()),
+    path('v1/verify-reset-code/', views.VerifyPasswordResetToken.as_view()),
+    path('v1/password-reset/', views.ResetPasswordView.as_view()),
     path('v1/logout/', views.LogoutView.as_view()),
 
 ]

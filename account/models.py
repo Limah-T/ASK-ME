@@ -46,6 +46,8 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, default=DEFAULT_ROLE)
     email_verified = models.BooleanField(default=False)
     token_verified = models.BooleanField(default=False)
+    reset_token = models.BooleanField(default=False)
+    time_token_set = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     objects = CustomUserManager()

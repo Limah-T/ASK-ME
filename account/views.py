@@ -200,7 +200,7 @@ class ResetPasswordView(FormView):
             print("An error ocurred: ", e)
             return render(request, "account/failed_verification.html")
         return super().dispatch(request, *args, **kwargs)
-    
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['uid'] = self.user.id
