@@ -149,6 +149,7 @@ class ForgetPasswordView(FormView):
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             email = form_rendered.cleaned_data.get('email')
+            print(email)
             try:
                 user_exist = CustomUser.objects.get(email=email)
                 user_exist.token_verified = False
@@ -156,7 +157,7 @@ class ForgetPasswordView(FormView):
                 send_token_for_password_reset(user=user_exist.email)
                 return render(request, "account/email_alert.html", {'username': user_exist.username, 'email': email})
             except Exception as e:
-                print(e)
+                print("Error occured while: ", e)
                 return render(request, "account/email_alert.html", {'username': '', 'email': email})         
         return super().post(request, *args, **kwargs)
 
