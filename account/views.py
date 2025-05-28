@@ -6,8 +6,6 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import forms
-from django.contrib.auth import views
 from django.contrib.auth.hashers import make_password
 from dotenv import load_dotenv
 from .functions import send_token_for_email_verification, decode_token, send_token_for_password_reset
