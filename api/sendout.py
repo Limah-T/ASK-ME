@@ -27,7 +27,7 @@ def get_token(user):
 
 def send_token_for_email_verification(user):
     token = get_token(user=user)
-    URL = f"{os.getenv("API_URL")}?token={token}"
+    URL = f"{os.getenv('API_URL')}?token={token}"
     print(URL)
     SUBJECT = "Email Verification"
 
