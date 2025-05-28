@@ -150,6 +150,7 @@ class ForgetPasswordView(FormView):
         if form_rendered.is_valid():
             email = form_rendered.cleaned_data.get('email')
             print(email)
+            print(CustomUser.objects.values())
             try:
                 user_exist = CustomUser.objects.get(email=email)
                 user_exist.token_verified = False
