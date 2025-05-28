@@ -5,6 +5,8 @@ from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPRecipientsRef
 from dotenv import load_dotenv
 import jwt, socket, os
 
+load_dotenv(override=True)
+
 def expiration_time(minutes):
     expiry_in = datetime.now(timezone.utc) + timedelta(minutes=minutes) 
     return expiry_in
