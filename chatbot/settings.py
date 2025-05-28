@@ -134,12 +134,6 @@ REST_FRAMEWORK = {
     ],    
 }
 
-# Security settings
-# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
-
-# ----------------------------
-# SSL/HTTPS SETTINGS
-# ----------------------------
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

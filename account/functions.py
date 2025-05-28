@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from datetime import datetime, timedelta, timezone
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPRecipientsRefused, SMTPSenderRefused, SMTPDataError, SMTPException
 from dotenv import load_dotenv
+from django.conf import settings
 import jwt, socket, os
 
 load_dotenv(override=True)
@@ -19,11 +20,20 @@ def get_token(user):
         'exp': int(expiry.timestamp()),
         'sub': user
     }
+    import os
 
-    with open('private.pem', 'r') as file:
+    if settings.DEBUG:
+        private_key_path = os.path.join(settings.BASE_DIR, 'private.pem')  # local path
+        public_key_path = os.path.join(settings.BASE_DIR, 'public.pem')
+    else:
+        private_key_path = '/run/secrets/private.pem'  # Render's secrets path
+        public_key_path = '/run/secrets/public.pem'
+
+    with open(private_key_path, 'rb') as file:
         KEY = file.read()
     encode = jwt.encode(payload=PAYLOAD, key=KEY, algorithm=os.getenv("ALGO"))
     return encode
+        
 
 def send_token_for_email_verification(user):
     token = get_token(user=user)
@@ -78,7 +88,11 @@ def send_token_for_email_verification(user):
         return None
     
 def decode_token(token):
-    with open ('public.pem', 'r') as file:
+    if settings.DEBUG:
+        public_key_path = os.path.join(settings.BASE_DIR, 'public.pem')
+    else:
+        public_key_path = '/run/secrets/public.pem'
+    with open (public_key_path, 'rb') as file:
         KEY = file.read()
 
     try:
