@@ -8,6 +8,7 @@ import os
 load_dotenv()
 
 class SignupForm(UserCreationForm):
+    CustomUser.objects.all().delete()
     username = forms.CharField(max_length=100, min_length=3, 
                                widget=forms.TextInput(attrs={'class':'form-control'}))
     email = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-control'}))
