@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('TOP_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -130,3 +130,28 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],    
 }
+
+# Security settings
+# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+
+# ----------------------------
+# SSL/HTTPS SETTINGS
+# ----------------------------
+
+SECURE_SSL_REDIRECT = True  # Force all requests to be HTTPS
+
+SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filtering
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent content-type sniffing
+
+SESSION_COOKIE_SECURE = True  # Only send cookies over HTTPS
+CSRF_COOKIE_SECURE = True  # Only send CSRF cookies over HTTPS
+
+CSRF_COOKIE_HTTPONLY = True  # Prevent JS from accessing CSRF cookie
+SESSION_COOKIE_HTTPONLY = True  # Prevent JS from accessing session cookie
+
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+SECURE_REFERRER_POLICY = 'same-origin'  # Control referer headers

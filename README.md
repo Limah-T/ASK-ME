@@ -29,13 +29,6 @@ python -m venv env
 source env/bin/activate  # or env\Scripts\activate on Windows
 pip install -r requirements.txt (check the requirements.txt file)
 
-🔐 Environment Variables
-
-SECRET_KEY=your-django-secret
-DEBUG=True
-ALLOWED_HOSTS=127.0.0.1,localhost
-SERPER_API_KEY=your-serper-api-key
-
 📍 API Endpoints (Overview)
 # Endpoint                                Method     Action
 /api/v1/signup/	                        POST	   Register new user.
@@ -43,7 +36,7 @@ SERPER_API_KEY=your-serper-api-key
 /api/v1/login/                          POST       Login with valid credentials.
 /api/v1/verify-code/                    POST       Verifies OTP code.
 /api/v1/forget-password/                POST       Enables password reset,and send code.
-/api/v1/verify-reset-code/              GET       Verifies code to reset password.
+/api/v1/verify-reset-code/              GET        Verifies code to reset password.
 /api/v1/password-reset/                 POST       Resets and saves new password.
 /api/v1/change-password/                POST       Verifies old password & change to new
 /api/v1/logout/                         POST       Logout user with valid token.
@@ -193,7 +186,6 @@ Endpoint: POST /api/v1/change-password/
 
 # 🔒 Logout Endpoint Details
 Endpoint: POST /api/v1/logout/
-
 Description:
 Logs out the authenticated user by pass the valid token in the header.
 
@@ -219,4 +211,3 @@ Halimah Temitope
 • LinkedIn - https://www.linkedin.com/in/limah-temitope/
 • GitHub - https://github.com/Limah-T/
 • Email - limahtechnology@yahoo.com
-
