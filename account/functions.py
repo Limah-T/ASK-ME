@@ -20,14 +20,11 @@ def get_token(user):
         'exp': int(expiry.timestamp()),
         'sub': user
     }
-    import os
 
     if settings.DEBUG:
         private_key_path = os.path.join(settings.BASE_DIR, 'private.pem')  # local path
-        public_key_path = os.path.join(settings.BASE_DIR, 'public.pem')
     else:
         private_key_path = '/run/secrets/private.pem'  # Render's secrets path
-        public_key_path = '/run/secrets/public.pem'
 
     with open(private_key_path, 'rb') as file:
         KEY = file.read()
@@ -106,8 +103,10 @@ def decode_token(token):
         return None
     
 def send_token_for_password_reset(user):
+    print("Here 1")
     token = get_token(user=user)
     URL = f"{os.getenv('PASSWORD_URL')}?token={token}"
+    print("here 2")
     print(URL)
     SUBJECT = "Reset Password"
 
