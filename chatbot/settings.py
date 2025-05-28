@@ -65,12 +65,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chatbot.wsgi.application'
 
+
+
 DATABASES = {
     'default': {
         'ENGINE':os.getenv("ENGINE"),
         'NAME':os.getenv("NAME"),
         'USER':os.getenv("USER"),
-        'PORT':os.getenv("PORT"),
+        'PORT':os.getenv("DB_PORT"),
         'HOST':os.getenv("HOST"),
         'PASSWORD':os.getenv("PASSWORD")
     }
