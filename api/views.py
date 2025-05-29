@@ -273,7 +273,7 @@ class ChatListView(generics.ListAPIView):
     http_method_names = ["get"]
     
     def get_queryset(self):
-        return Chat.objects.filter(user=self.request.user).order_by("-timestamp")
+        return Chat.objects.filter(user=self.request.user).order_by("-time_stamp")
 
     def get(self, request, *args, **kwargs):
         length_of_data = len(request.data)
