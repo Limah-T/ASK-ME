@@ -3,6 +3,7 @@ from account.models import CustomUser
 from account.country_names import COUNTRY_CHOICES, DEFAULT_ROLE
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from chat.models import Chat
 
 class ChoiceFieldCustomSerializer(serializers.ChoiceField):
     def to_internal_value(self, data):
@@ -118,3 +119,9 @@ class ChatCreateSerializer(serializers.Serializer):
         if len(value) <= 8:
             raise serializers.ValidationError({'error': 'Please ask a valid question'})
         return value
+    
+class ChatListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Chat
+        fields = ["id", "user_message", "bot_reply", "timestamp"]
