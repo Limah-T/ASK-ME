@@ -124,4 +124,4 @@ class ChatListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ["id", "user_message", "bot_reply", "timestamp"]
+        fields = ["id", "user_message", "bot_reply", "time_stamp"]
