@@ -35,7 +35,7 @@ class SignUpView(FormView):
                 return render(request, "account/email_alert.html", {'username': username, 'email': email})
             messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
             CustomUser.objects.filter(email=email).delete()
-            return render(request, "account/signup.html", {'form': form.SignupForm()})
+            # return render(request, "account/signup.html", {'form': form.SignupForm()})
         return super().post(request, *args, **kwargs)
     
 class VerifyEmailViaToken(View):
