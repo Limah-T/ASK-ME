@@ -113,3 +113,8 @@ class ChangePasswordSerializer(serializers.Serializer):
     
 class ChatCreateSerializer(serializers.Serializer):
     question = serializers.CharField(max_length=255, trim_whitespace=True)
+
+    def validate_question(self, value):
+        if len(value) <= 8:
+            raise serializers.ValidationError({'error': 'Please ask a valid question'})
+        return value

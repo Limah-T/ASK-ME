@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
+from chat.wiki_api import chatexchange
+from chat.models import Chat
 import os
 load_dotenv()
 
@@ -254,10 +256,16 @@ class ChatCreateView(generics.CreateAPIView):
         print(request.data)
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_message = serializer.validated_data.get('question')
-        print(user_message)
-
-        return Response(data={'success': 'recieved'}, status=status.HTTP_200_OK)
+        user_question = serializer.validated_data.get('question')
+        print(user_question)
+        bot_reply = chatexchange(user_message=user_question)
+        exchange = Chat.objects.create(user=request.user, user_message=user_question,
+                                       bot_reply=bot_reply)
+        return Response(data={
+                        'you': user_question,
+                        'bot': bot_reply,
+                        'time': exchange.time_stamp
+                        }, status=status.HTTP_200_OK)
 
 class LogoutView(views.APIView):
     authentication_classes = [TokenAuthentication]
