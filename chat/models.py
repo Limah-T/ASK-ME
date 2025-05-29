@@ -8,6 +8,7 @@ class Chat(models.Model):
     user_message = models.TextField()
     bot_reply = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         self.user_message = self.user_message.strip()
