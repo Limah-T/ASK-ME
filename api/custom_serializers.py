@@ -111,6 +111,5 @@ class ChangePasswordSerializer(serializers.Serializer):
         data.pop('confirm_password')
         return data
     
-class ChatSerializer(serializers.Serializer):
+class ChatCreateSerializer(serializers.Serializer):
     question = serializers.CharField(max_length=255, trim_whitespace=True)
-    

@@ -5,12 +5,13 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
+from rest_framework import generics
 from django.contrib.auth import logout, authenticate
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from datetime import timedelta
 from dotenv import load_dotenv
-from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer
+from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 import os
@@ -244,6 +245,20 @@ class ChangePasswordView(views.APIView):
         user.save()
         return Response(data={'success': 'Your password has been changed successfully.'}, status=status.HTTP_200_OK)
         
+class ChatCreateView(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        serializer = ChatCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_message = serializer.validated_data.get('question')
+        print(user_message)
+
+        return Response(data={'success': 'recieved'}, status=status.HTTP_200_OK)
+
 class LogoutView(views.APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
