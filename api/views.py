@@ -266,7 +266,24 @@ class ChatCreateView(generics.CreateAPIView):
                         'bot': bot_reply,
                         'time': exchange.time_stamp
                         }, status=status.HTTP_200_OK)
+    
+class ChatListView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get"]
+    
+    def get_queryset(self):
+        return Chat.objects.filter(user=self.request.user).order_by("-timestamp")
 
+    def get(self, request, *args, **kwargs):
+        length_of_data = len(request.data)
+        if length_of_data:
+            return Response(
+                data={'error': 'No data is required in the body parameters.'},  status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().get(request, *args, **kwargs)
+
+        
 class LogoutView(views.APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
