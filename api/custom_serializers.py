@@ -120,8 +120,10 @@ class ChatCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': 'Please ask a valid question'})
         return value
     
-class ChatListSerializer(serializers.ModelSerializer):
+class ChatListSerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
+    user_message = serializers.CharField()
+    bot_reply = serializers.CharField()
+    time_stamp = serializers.DateTimeField()
 
-    class Meta:
-        model = Chat
-        fields = ["id", "user_message", "bot_reply", "time_stamp"]
+    
