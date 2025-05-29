@@ -31,7 +31,7 @@
             {% else %}
               {{ chat.bot_reply }}
             {% endif %}
-            <div class="chat-timestamp">bot • {{ chat.created_at|timesince }} ago</div>
+            <div class="chat-timestamp">bot • {{ chat.created_at|timesince:chat.time_stamp }} ago</div>
           </div>
         {% endif %}
       {% empty %}

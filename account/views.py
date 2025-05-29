@@ -23,7 +23,6 @@ class SignUpView(FormView):
     http_method_names = ["post", "get"]
 
     def post(self, request, *args, **kwargs):
-        # CustomUser.objects.all().delete()
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             print(form_rendered.cleaned_data)
@@ -32,8 +31,11 @@ class SignUpView(FormView):
             user = form_rendered.save(commit=False)
             user.role = DEFAULT_ROLE
             user.save()
-            send_token_for_email_verification(user=email)
-            return render(request, "account/email_alert.html", {'username': username, 'email': email})
+            if send_token_for_email_verification(user=email):
+                return render(request, "account/email_alert.html", {'username': username, 'email': email})
+            messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
+            CustomUser.objects.filter(email=email).delete()
+            return render(request, "account/signup.html", {'form': form.SignupForm()})
         return super().post(request, *args, **kwargs)
     
 class VerifyEmailViaToken(View):
@@ -49,12 +51,12 @@ class VerifyEmailViaToken(View):
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            pass
+            return render(request, "account/error_message.html")
         except CustomUser.MultipleObjectsReturned:
-            pass
+            return render(request, "account/error_message.html")
         except Exception as e:
             print(e)
-            pass
+            return render(request, "account/error_message.html")
         if user.email_verified and user.token_verified:
             return render(request, "account/error_message.html")
         user.email_verified = True
@@ -92,7 +94,7 @@ class LoginView(FormView):
                 if get_otp_for_user.send_otp_to_email(app_name="account"):
                     form_otp = form.OTPForm()
                     return render(request, "account/otp_input.html", {'form':form_otp, 'uid':user.id})
-                messages.error(request, message="Sorry, the network is quite bad st the moment, please try again later.")
+                messages.error(request, message="Sorry, the network is quite bad at the moment, please try again later.")
         return redirect(reverse_lazy("account:login"))
     
 class VerifyOTP(FormView):

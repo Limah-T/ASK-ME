@@ -1,0 +1,19 @@
+{% extends 'account/base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found{% endblock %}
+{% block main %}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <img src="{% static 'images/404.png' %}" alt="404 page not found" width="300" height="300">
+        <p style="font-size: 1.1rem;">
+            Oops! the page you're looking for does not exist, click to go 
+            <a href="{% url 'home:home' %}" class="btn btn-secondary ms-2">Home</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}
+{% block footer %}{% endblock %}

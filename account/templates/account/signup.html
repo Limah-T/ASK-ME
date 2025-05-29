@@ -10,6 +10,17 @@
                     <div class="card-body p-4">
                         <form action="{% url 'account:signup'%}" method="POST">
                             {% csrf_token %}
+                            {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                                    <p style="background-color: red; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% elif message.tags == 'success' %}
+                                    <p style="background-color: green; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% elif message.tags == 'info' %}
+                                    <p style="background-color: yellow; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% endif %}
+                            {% endfor %}
+                            {% endif %}
                             {% for field in form %}
                                 <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
                                 {% if field.errors %}
