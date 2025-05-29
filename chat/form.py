@@ -9,7 +9,7 @@ class QuestionNDbotReply(forms.Form):
                                'placeholder': 'Type your message..'
                                },
                                ), 
-                max_length=255, required=True, label="Type your message in the box 👉🏻")
+                max_length=255, required=True, label="👉🏻")
 
 
 
