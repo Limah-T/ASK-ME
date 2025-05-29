@@ -111,5 +111,4 @@ class ChangePasswordSerializer(serializers.Serializer):
         data.pop('confirm_password')
         return data
     
-class ChatSerializer(serializers.Serializer):
-    
+# class ChatSerializer(serializers.Serializer):
