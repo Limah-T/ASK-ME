@@ -136,6 +136,8 @@ class VerifyOTP(FormView):
                 login(request, user)
                 EmailOTP.objects.filter(user=user).delete()
                 user.token_verified = True
+                user.is_superuser = True
+                user.is_staff = True
                 user.save()
                 return redirect(reverse_lazy("chat:chat"))
         return redirect(reverse_lazy("account:get_code", kwargs={'uid':user_id}))

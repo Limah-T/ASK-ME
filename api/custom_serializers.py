@@ -110,3 +110,6 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': 'Passwords do not match.'})
         data.pop('confirm_password')
         return data
+    
+class ChatSerializer(serializers.Serializer):
+    
