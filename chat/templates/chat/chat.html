@@ -23,7 +23,7 @@
       {% for chat in chats %}
         {% if chat.user == user %}
           <div class="chat-message user">{{ chat.user_message }}
-            <div class="chat-timestamp">you • {{ chat.created_at|timesince }} ago</div>
+            <div class="chat-timestamp">you • {{ chat.created_at|timesince:chat.time_stamp }} ago</div>
           </div>
           <div class="chat-message bot">
             {% if forloop.last %}
