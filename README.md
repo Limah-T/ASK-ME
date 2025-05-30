@@ -5,7 +5,6 @@ ChatBotApp API is a RESTful service designed to provide users with a smart and r
 Built using Django Rest Framework, the goal of this project is to offer a robust and secure backend system that is easy to integrate with frontend or mobile applications.
 
 🚀 Features
-
 ✅ User Registration, Login & Logout
 ✅ JWT Authentication
 ✅ Smart Chatbot Interaction via Serper API
@@ -15,7 +14,6 @@ Built using Django Rest Framework, the goal of this project is to offer a robust
 ✅ Modular & Extensible Design
 
 🛠️ Tech Stack
-
 Backend Framework: Django + Django REST Framework
 External APIs: Serper API
 Authentication: JSON Web Token (JWT) for Email Verification
@@ -40,11 +38,13 @@ pip install -r requirements.txt (check the requirements.txt file)
 /api/v1/password-reset/                 POST       Resets and saves new password.
 /api/v1/change-password/                POST       Verifies old password & change to new
 /api/v1/logout/                         POST       Logout user with valid token.
+/api/v1/get-new-token/                  POST       Verifies email and password to get new token
+/api/v1/chat-question/                  POST       Enables users to ask the bot questions
+/api/v1/chat-history/                   POST       Views users chat history associated to the current user.
 
 # 📝 Signup Endpoint Details
 Endpoint: POST /api/v1/signup/
-Description:
-Signs in user with validated credentials, then sends email for verification.
+Description: Signs in user with validated credentials, then sends email for verification.
     Request Body  {
                     "email": "your-email",
                     "username": "your-email",
@@ -77,9 +77,8 @@ Signs in user with validated credentials, then sends email for verification.
             }
 
 # 📝 Login Endpoint Details
-Description:
-Validates credentials, then sends OTP Code to email for verification.
 Endpoint: POST /api/v1/login/
+Description: Validates credentials, then sends OTP Code to email for verification.
     Request Body
                 {
                     "email": "your-email",
@@ -114,9 +113,8 @@ Endpoint: POST /api/v1/login/
             }
 
 # 🔁 Forget password Endpoint Details
-Description:
-Validates user's email, then sends code to email for verification, verifies and reset password.
 Endpoint: POST /api/v1/forget-password/
+Description: Validates user's email, then sends code to email for verification, verifies and reset password.
     Request Body
                 {
                     "email": "your-email",
@@ -165,9 +163,10 @@ Endpoint: POST /api/v1/forget-password/
             }
 
 # 🔒 Change password Endpoint Details
-Description:
-Validates authenticated user's old and new password, then change to the new password.
 Endpoint: POST /api/v1/change-password/
+Description: Validates authenticated user's old and new password, then change to the new password.
+    Header
+        Authorization: Bearer <your-auth-token>
     Request Body
                 {
                     "old_password": "your-recent-password",
@@ -184,11 +183,84 @@ Endpoint: POST /api/v1/change-password/
         "error": "Recent password is incorrect."
         }
 
+# 🔐 Get-new-token Endpoint Details
+Endpoint: POST /api/v1/get-new-token/
+Description: Validates credentials, then sends OTP Code to email for verification.
+    Request Body
+                {
+                    "email": "your-email",
+                    "password": "your-password"
+                }
+    Responses
+    # Success (HTTP 200):
+        {
+        "message": "Please check your email for an OTP code."
+        }
+    # Error (HTTP 400):
+        {
+        "error": "Email or password is incorrect."
+        }
+    Action => Verify OTP Code
+    📧✅ OTP verification required 
+    POST /api/v1/verify-code/
+    Request Body
+                {
+                    "email": "your-email",
+                    "code": "code-sent-to-email"
+                }
+    Responses
+        # Success (HTTP 200):
+            {
+                "success": "Code Accepted.",
+                "token": "token-key"
+            }
+        # Error (HTTP 400): (Code expires after 5mins.)
+            {
+                "error": "Invalid or Expired token."
+            }
+
+# 🗨️ Chat Interaction (Q&A) Endpoint Details
+Endpoint: POST /api/v1/chat-question/
+Description: Checks the length of user's question to be more than 7 characters and return bot-reply response.
+    Header
+        Authorization: Bearer <your-auth-token>
+    Request Body
+                {
+                    "question": "your-question",
+                }
+    Responses
+    # Success (HTTP 200):
+        {
+        "success": "bot-reply."
+        }
+    # Error (HTTP 400):
+        {
+        "error": "Please ask a valid question."
+        }
+
+# 🕘💬 Chat history
+Endpoint: POST /api/v1/chat-history/
+Description: Displays chat history between the current user and bot
+    Header
+        Authorization: Bearer <your-auth-token>
+    Request Body:
+        No body required.
+    Responses:
+    # Success (HTTP 200)
+        {
+            "id": "chat-id",
+            "user_message": "question",
+            "bot_reply": "bot-response",
+            "time_stamp": "chat-time"
+        }
+    # Error (HTTP 400)
+        {
+            "error": "Invalid token"
+        }    
+
 # 🔒 Logout Endpoint Details
 Endpoint: POST /api/v1/logout/
-Description:
-Logs out the authenticated user by pass the valid token in the header.
-
+Description: Logs out the authenticated user by pass the valid token in the header.
     Header
         Authorization: Bearer <your-auth-token>
     Request Body:

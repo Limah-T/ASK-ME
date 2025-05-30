@@ -128,13 +128,14 @@ class GetNewTokenSerializer(serializers.Serializer):
         if not user: 
             raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
         user.token_verified = False
+        user.save()
         return user
     
 class ChatCreateSerializer(serializers.Serializer):
     question = serializers.CharField(max_length=255, trim_whitespace=True)
 
     def validate_question(self, value):
-        if len(value) <= 8:
+        if len(value) <= 7:
             raise serializers.ValidationError({'error': 'Please ask a valid question'})
         return value
     

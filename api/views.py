@@ -47,7 +47,6 @@ class SignUpView(views.APIView):
 class VerifyEmailView(views.APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
-    renderer_classes = [JSONRenderer]
     http_method_names = ['get']
 
     def get(self, request):
@@ -268,12 +267,12 @@ class GetNewTokenView(views.APIView):
         serializer = GetNewTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-        # Deletes previous token
-        Token.objects.filter(user=user).delete()
-        token = Token.objects.create(user=user)
-        user.token_verified = True
-        user.save()
-        return Response(data={'token': token.key}, status=status.HTTP_200_OK)
+        if EmailOTP.objects.filter(user=user).exists():
+            EmailOTP.objects.filter(user=user).delete()
+        get_otp = EmailOTP.objects.create(user=user)
+        if get_otp.send_otp_to_email(app_name="api"):
+            return Response(data={'message': 'Please check your email for OTP code.'}, status=status.HTTP_200_OK)
+        return Response(data={'error': 'Error occured while sending OTP to email'}, status=status.HTTP_400_BAD_REQUEST)
     
 class ChatCreateView(generics.CreateAPIView):
     authentication_classes = [TokenAuthentication]
