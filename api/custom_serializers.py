@@ -53,9 +53,9 @@ class LoginSerializer(serializers.Serializer):
         try:
             user_exist = CustomUser.objects.get(email=data['email'])
         except Exception as e:
-            return None
+            raise serializers.ValidationError({'error': 'No user associated with this account'})
         if user_exist.token_verified:
-            raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
+                raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
         user = authenticate(email=data['email'], password=data['password'])
         print(user, "user from serializer class")
         if not user: 

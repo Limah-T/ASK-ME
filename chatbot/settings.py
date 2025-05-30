@@ -9,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('TOP_KEY')
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
+# print(DEBUG)
+# DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ask-me-4j4v.onrender.com"]
 
