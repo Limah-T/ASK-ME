@@ -131,7 +131,7 @@ class GetNewTokenSerializer(serializers.Serializer):
         try:
             user_exist = CustomUser.objects.get(email=data['email'])
         except Exception as e:
-            return None
+            raise serializers.ValidationError({'error': 'No user associated with this account'})
         if not user_exist.email_verified:
             raise serializers.ValidationError({'error': 'Invalid request, user\'s account has not been verified.'})
         user = authenticate(email=data['email'], password=data['password'])
