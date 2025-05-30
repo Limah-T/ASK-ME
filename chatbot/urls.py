@@ -8,3 +8,6 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('api/', include('api.urls')),
 ]
+
+handler404 = 'api.views.customexceptionhandler'
+

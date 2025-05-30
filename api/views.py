@@ -6,9 +6,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework import generics
+from rest_framework.views import exception_handler
 from django.contrib.auth import logout, authenticate
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from django.http import JsonResponse
+from django.shortcuts import render
 from datetime import timedelta
 from dotenv import load_dotenv
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer
@@ -18,6 +21,11 @@ from chat.wiki_api import chatexchange
 from chat.models import Chat
 import os
 load_dotenv()
+
+def customexceptionhandler(request, exception):
+    if request.path.startswith('/api/'):
+        return JsonResponse({'detail': 'Not found'}, status=400)
+    return render(request, '404.html', status=404)
 
 class SignUpView(views.APIView):
     authentication_classes = []
