@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework import generics
-from rest_framework.views import exception_handler
 from django.contrib.auth import logout, authenticate
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -14,7 +13,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from datetime import timedelta
 from dotenv import load_dotenv
-from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer
+from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer, GetNewTokenSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 from chat.wiki_api import chatexchange
@@ -254,7 +253,28 @@ class ChangePasswordView(views.APIView):
         user.password = make_password(password=new_password)
         user.save()
         return Response(data={'success': 'Your password has been changed successfully.'}, status=status.HTTP_200_OK)
-        
+    
+class GetNewTokenView(views.APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    http_method_names = ['post']
+
+    def post(self, request):
+        length_of_data = len(request.data)
+        if length_of_data > 2 or length_of_data < 2:
+            return Response(
+                data={'error': 'Only email, and password are required.'}, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = GetNewTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        # Deletes previous token
+        Token.objects.filter(user=user).delete()
+        token = Token.objects.create(user=user)
+        user.token_verified = True
+        user.save()
+        return Response(data={'token': token.key}, status=status.HTTP_200_OK)
+    
 class ChatCreateView(generics.CreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

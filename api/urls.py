@@ -13,6 +13,9 @@ urlpatterns = [
     path('v1/password-reset/', views.ResetPasswordView.as_view()),
     path('v1/change-password/', views.ChangePasswordView.as_view()),
     path('v1/logout/', views.LogoutView.as_view()),
+    
+    # Get new token
+    path('v1/get-new-token/', views.GetNewTokenView.as_view()),
 
     # Chatbot Interaction routes
     path('v1/chat-question/', views.ChatCreateView.as_view()),

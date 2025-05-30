@@ -46,7 +46,7 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            user_exist = CustomUser.objects.get(email=data['email'])
+            user_exist = CustomUser.objects.get(email=data['email'].lower())
         except Exception as e:
             return None
         if user_exist.token_verified:
@@ -111,6 +111,24 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': 'Passwords do not match.'})
         data.pop('confirm_password')
         return data
+    
+class GetNewTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(trim_whitespace=True)
+    password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
+
+    def validate(self, data):
+        try:
+            user_exist = CustomUser.objects.get(email=data['email'].lower())
+        except Exception as e:
+            return None
+        if not user_exist.email_verified:
+            raise serializers.ValidationError({'error': 'Invalid request, user\'s account has not been verified.'})
+        user = authenticate(email=data['email'], password=data['password'])
+        print(user, "user from serializer class")
+        if not user: 
+            raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
+        user.token_verified = False
+        return user
     
 class ChatCreateSerializer(serializers.Serializer):
     question = serializers.CharField(max_length=255, trim_whitespace=True)
