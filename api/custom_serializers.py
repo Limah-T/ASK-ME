@@ -3,7 +3,6 @@ from account.models import CustomUser
 from account.country_names import COUNTRY_CHOICES, DEFAULT_ROLE
 from django.contrib.auth import authenticate
 from django.utils import timezone
-from chat.models import Chat
 
 class ChoiceFieldCustomSerializer(serializers.ChoiceField):
     def to_internal_value(self, data):
@@ -16,6 +15,9 @@ class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
     country = ChoiceFieldCustomSerializer(choices=COUNTRY_CHOICES)
     password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
+
+    def validate_email(self, value):
+        return value.lower()
 
     def validate_country(self, value):
         if value:
@@ -44,9 +46,12 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
     password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
 
+    def validate_email(self, value):
+        return value.lower()
+
     def validate(self, data):
         try:
-            user_exist = CustomUser.objects.get(email=data['email'].lower())
+            user_exist = CustomUser.objects.get(email=data['email'])
         except Exception as e:
             return None
         if user_exist.token_verified:
@@ -80,11 +85,14 @@ class SetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
     confirm_password = serializers.CharField(trim_whitespace=True, min_length=8, write_only=True)
 
+    def validate_email(self, value):
+        return value.lower()
+
     def validate(self, data):
         if len(data) > 3 or len(data) < 3:
             raise serializers.ValidationError({'error': 'Only email, new_password, and confirm_password are required in the request body.'})
         try:
-            user = CustomUser.objects.get(email=data['email'].lower())
+            user = CustomUser.objects.get(email=data['email'])
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError({"error": "Email does not exist!"})
         except CustomUser.MultipleObjectsReturned:
@@ -116,9 +124,12 @@ class GetNewTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
     password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=True)
 
+    def validate_email(self, value):
+        return value.lower()
+
     def validate(self, data):
         try:
-            user_exist = CustomUser.objects.get(email=data['email'].lower())
+            user_exist = CustomUser.objects.get(email=data['email'])
         except Exception as e:
             return None
         if not user_exist.email_verified:
