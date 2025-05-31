@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.http import JsonResponse
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from datetime import timedelta
 from dotenv import load_dotenv
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer, GetNewTokenSerializer
@@ -294,6 +295,14 @@ class ChatCreateView(generics.CreateAPIView):
                         'time': exchange.time_stamp
                         }, status=status.HTTP_200_OK)
     
+# from django_filters import rest_framework as filter
+# class ChatFilter(filter.FilterSet):
+#     user_message = filter.CharFilter(field_name="user_message", lookup_expr="icontains")
+
+#     class Meta:
+#         model = Chat
+#         fields = ["user_message"]
+
 class ChatListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -301,7 +310,15 @@ class ChatListView(generics.ListAPIView):
     serializer_class = ChatListSerializer
     
     def get_queryset(self):
-        return Chat.objects.filter(user=self.request.user).order_by("-time_stamp")
+        # Fitering against current user
+        base_query = Chat.objects.filter(user=self.request.user)
+        user_message_query = self.request.query_params.get("user_message", None)
+        bot_reply_query = self.request.query_params.get("bot_reply", None)
+        if user_message_query:
+            base_query = base_query.filter(user_message__icontains=user_message_query).order_by("-time_stamp")
+        if bot_reply_query:
+            base_query = base_query.filter(bot_reply__icontains=bot_reply_query).order_by("-time_stamp")
+        return base_query
 
     def get(self, request, *args, **kwargs):
         length_of_data = len(request.data)
