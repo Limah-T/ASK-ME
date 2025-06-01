@@ -238,6 +238,10 @@ class ChangePasswordView(views.APIView):
     http_method_names = ["post"]
 
     def post(self, request):
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
         length_of_data = len(request.data)
         if length_of_data > 3 or length_of_data < 3:
             return Response(data={'error': 'Only old_password, new_password, and confirm_password are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -281,7 +285,11 @@ class ChatCreateView(generics.CreateAPIView):
     http_method_names = ["post"]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_question = serializer.validated_data.get('question')
@@ -293,15 +301,8 @@ class ChatCreateView(generics.CreateAPIView):
                         'you': user_question,
                         'bot': bot_reply,
                         'time': exchange.time_stamp
-                        }, status=status.HTTP_200_OK)
-    
-# from django_filters import rest_framework as filter
-# class ChatFilter(filter.FilterSet):
-#     user_message = filter.CharFilter(field_name="user_message", lookup_expr="icontains")
-
-#     class Meta:
-#         model = Chat
-#         fields = ["user_message"]
+                        }, status=status.HTTP_200_OK
+                )
 
 class ChatListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
@@ -311,6 +312,11 @@ class ChatListView(generics.ListAPIView):
     
     def get_queryset(self):
         # Fitering against current user
+        email_verified = self.request.user.email_verified
+        token_verified = self.request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        
         base_query = Chat.objects.filter(user=self.request.user)
         user_message_query = self.request.query_params.get("user_message", None)
         bot_reply_query = self.request.query_params.get("bot_reply", None)
@@ -321,13 +327,157 @@ class ChatListView(generics.ListAPIView):
         return base_query
 
     def get(self, request, *args, **kwargs):
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        
         length_of_data = len(request.data)
         if length_of_data:
             return Response(
                 data={'error': 'No data is required in the body parameters.'},  status=status.HTTP_400_BAD_REQUEST
             )
         return super().get(request, *args, **kwargs)
+    
+class ChatDetailView(generics.RetrieveDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "delete"]
+    lookup_field = "pk"
+    serializer_class = ChatListSerializer
 
+    def get_queryset(self):
+        email_verified = self.request.user.email_verified
+        token_verified = self.request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Chat.objects.filter(user=self.request.user)
+
+    def get(self, request, pk):
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            chat_exist = Chat.objects.get(id=pk)
+        except Chat.DoesNotExist:
+            return Response(data={'error': 'Id does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Chat.MultipleObjectsReturned:
+            return Response(data={'error': 'Multiple chat found with this id.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return Response(data={'error': 'Invalid ID.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        length_of_data = len(request.data)
+        if length_of_data:
+            return Response(
+                data={'error': 'No data is required in the body parameters.'},  status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(data={
+                            'id': chat_exist.id,
+                            'user_message': chat_exist.user_message,
+                            'bot_reply': chat_exist.bot_reply,
+                            'time_stamp': chat_exist.time_stamp.date()
+                        },status=status.HTTP_200_OK
+                )
+    
+    def delete(self, request, pk):
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            chat_exist = Chat.objects.get(id=pk)
+            print("here")
+        except Chat.DoesNotExist:
+            return Response(data={'error': 'Id does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Chat.MultipleObjectsReturned:
+            return Response(data={'error': 'Multiple chat found with this id.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return Response(data={'error': 'Invalid ID.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        length_of_data = len(request.data)
+        if length_of_data:
+            return Response(
+                data={'error': 'No data is required in the body parameters.'},  status=status.HTTP_400_BAD_REQUEST
+            )
+        chat_exist.delete()
+        return Response(data={'success': 'chat deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+class ChatUpdateView(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["patch", "put"]
+
+    def get_queryset(self):
+        if not self.request.user.email_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+        return Chat.objects.filter(user=self.request.user)
+
+    def put(self, request, *args, **kwargs):
+        chat_id = request.query_params.get("pk", None)
+        if not chat_id:
+            return Response(data={'error': 'Pk is missing in query paramater.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            chat_exists = Chat.objects.get(id=chat_id)
+        except Chat.DoesNotExist:
+            return Response(data={'error': 'id does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Chat.MultipleObjectsReturned:
+            return Response(data={'error': 'multiple chat found with this id.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': 'an error occured when searching for the chat id'}, status=status.HTTP_400_BAD_REQUEST)
+        length_of_data = len(request.data)
+        if length_of_data > 1 or length_of_data < 1:
+            return Response(data={'error': 'only question is allowed in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ChatCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        question = serializer.validated_data.get('question')
+        bot_reply = chatexchange(user_message=question)
+        chat_exists.user_message = question
+        chat_exists.bot_reply = bot_reply
+        chat_exists.save()
+
+        return Response(data={
+                        'sucesss': 'successfully updated prompt.',
+                        'id': chat_exists.id,
+                        'user_messsage': chat_exists.user_message,
+                        'bot_reply': chat_exists.bot_reply,
+                        },status=status.HTTP_200_OK
+                )
+    
+    def patch(self, request, *args, **kwargs):
+        chat_id = request.query_params.get("id", None)
+        if not chat_id:
+            return Response(data={'error': 'Id is missing in query paramater.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            chat_exists = Chat.objects.get(id=chat_id)
+        except Chat.DoesNotExist:
+            return Response(data={'error': 'id does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Chat.MultipleObjectsReturned:
+            return Response(data={'error': 'multiple chat found with this id.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': 'an error occured when searching for the chat id'}, status=status.HTTP_400_BAD_REQUEST)
+        length_of_data = len(request.data)
+        if length_of_data > 1 or length_of_data < 1:
+            return Response(data={'error': 'only question is allowed in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ChatCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        question = serializer.validated_data.get('question')
+        bot_reply = chatexchange(user_message=question)
+        chat_exists.user_message = question
+        chat_exists.bot_reply = bot_reply
+        chat_exists.save()
+
+        return Response(data={
+                        'sucesss': 'successfully updated prompt.',
+                        'id': chat_exists.id,
+                        'user_messsage': chat_exists.user_message,
+                        'bot_reply': chat_exists.bot_reply,
+                        },status=status.HTTP_200_OK
+                )
         
 class LogoutView(views.APIView):
     authentication_classes = [TokenAuthentication]
@@ -335,6 +485,10 @@ class LogoutView(views.APIView):
     http_method_names = ['post']
 
     def post(self, request):
+        email_verified = request.user.email_verified
+        token_verified = request.user.token_verified
+        if not email_verified and not token_verified:
+            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
         Token.objects.filter(user=request.user).delete()
         request.user.token_verified = False
         request.user.save()

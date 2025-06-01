@@ -156,4 +156,4 @@ class ChatListSerializer(serializers.Serializer):
     bot_reply = serializers.CharField()
     time_stamp = serializers.DateTimeField()
 
-    
+ 
