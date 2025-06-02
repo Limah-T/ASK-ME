@@ -3,7 +3,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
@@ -12,7 +11,6 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.http import JsonResponse
 from django.shortcuts import render
-from django_filters.rest_framework import DjangoFilterBackend
 from datetime import timedelta
 from dotenv import load_dotenv
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer, GetNewTokenSerializer
@@ -307,6 +305,14 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size = 100
     page_size_query_param = 'page_size'
     max_page_size = 1000
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': len(data),
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'results': data,
+        })
 
 class ChatListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]

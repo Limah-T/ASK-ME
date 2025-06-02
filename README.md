@@ -257,11 +257,18 @@ pip install -r requirements.txt (check the requirements.txt file)
              
         Responses:
         # Success (HTTP 200)
-            {   
-                "id": "chat-id",
-                "user_message": "question",
-                "bot_reply": "bot-response",
-                "time_stamp": "chat-time"
+            {
+                "count": length-of-data-count-returned,
+                "next": E.g "https://ask-me-4j4v.onrender.com/api/v1/chat-history/?page=2&page_size=5",
+                "previous": null,
+                "results": [
+                            {   
+                                "id": "chat-id",
+                                "user_message": "question",
+                                "bot_reply": "bot-response",
+                                "time_stamp": "chat-time"
+                            }
+                    ]
             }
         # Error (HTTP 400)
             {
