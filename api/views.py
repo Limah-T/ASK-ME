@@ -417,7 +417,7 @@ class ChatUpdateView(generics.UpdateAPIView):
             return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
         return Chat.objects.filter(user=self.request.user)
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs): 
         chat_id = request.query_params.get("pk", None)
         if not chat_id:
             return Response(data={'error': 'Pk is missing in query paramater.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -449,9 +449,9 @@ class ChatUpdateView(generics.UpdateAPIView):
                 )
     
     def patch(self, request, *args, **kwargs):
-        chat_id = request.query_params.get("id", None)
+        chat_id = request.query_params.get("pk", None)
         if not chat_id:
-            return Response(data={'error': 'Id is missing in query paramater.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Pk is missing in query paramater.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             chat_exists = Chat.objects.get(id=chat_id)
         except Chat.DoesNotExist:
