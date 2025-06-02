@@ -57,7 +57,6 @@ class LoginSerializer(serializers.Serializer):
         if user_exist.token_verified:
                 raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
         user = authenticate(email=data['email'], password=data['password'])
-        print(user, "user from serializer class")
         if not user: 
             raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
         return user
@@ -78,7 +77,6 @@ class ForgetPasswordSerializer(serializers.Serializer):
         user.token_verified = False
         user.save()
         return value
-    
     
 class SetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(trim_whitespace=True)
@@ -135,7 +133,6 @@ class GetNewTokenSerializer(serializers.Serializer):
         if not user_exist.email_verified:
             raise serializers.ValidationError({'error': 'Invalid request, user\'s account has not been verified.'})
         user = authenticate(email=data['email'], password=data['password'])
-        print(user, "user from serializer class")
         if not user: 
             raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
         user.token_verified = False

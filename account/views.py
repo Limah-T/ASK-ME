@@ -93,6 +93,7 @@ class LoginView(FormView):
                 get_otp_for_user = EmailOTP.objects.create(user=user)
                 if get_otp_for_user.send_otp_to_email(app_name="account"):
                     form_otp = form.OTPForm()
+                    print("here")
                     return render(request, "account/otp_input.html", {'form':form_otp, 'uid':user.id})
                 messages.error(request, message="Sorry, the network is quite bad at the moment, please try again later.")
         return redirect(reverse_lazy("account:login"))

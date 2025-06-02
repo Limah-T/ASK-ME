@@ -21,6 +21,6 @@ urlpatterns = [
     path('v1/chat-question/', views.ChatCreateView.as_view()),
     path('v1/chat-history/', views.ChatListView.as_view()),
     path('v1/chat-update/', views.ChatUpdateView.as_view()),
-    path('v1/chat/<pk>', views.ChatDetailView.as_view()),
+    path('v1/chat/', views.ChatDetailView.as_view()),
 
 ]
