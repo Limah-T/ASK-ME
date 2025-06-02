@@ -405,7 +405,7 @@ class ChatDetailView(generics.RetrieveDestroyAPIView):
                 data={'error': 'No data is required in the body parameters.'},  status=status.HTTP_400_BAD_REQUEST
             )
         chat_exist.delete()
-        return Response(data={'success': 'chat deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        return Response(data={'success': 'chat deleted successfully.'}, status=status.HTTP_200_OK)
     
 class ChatUpdateView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
