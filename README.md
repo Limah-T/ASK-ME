@@ -250,9 +250,8 @@ pip install -r requirements.txt (check the requirements.txt file)
             No data required.
         Query parameters (Optional)
             Parameter key must be either "user_message" or "bot_reply" to get accurate results.
-            . Filtering =>  E.g  ?user_message=filter-by-any-existing-word-or-words
-                                 OR  
-                            bot_reply=any-existing-word-or-words
+            . Filtering => E.g ?time_stamp=date-time-field
+            . Searching =? E.g ?search=an-existing-word-or-words
             . Pagination => E.g ?page=1&page_size=5
              
         Responses:

@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django.contrib.auth import logout, authenticate
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -313,6 +314,15 @@ class StandardResultsSetPagination(PageNumberPagination):
             'previous': self.get_previous_link(),
             'results': data,
         })
+    
+class CustomSearchFilter(SearchFilter):
+    def get_search_fields(self, view, request):
+        if request.query_params.get("user_message"):
+            return ['user_message']
+        if request.query_params.get("bot_reply"):
+            print("here2")
+            return ['bot_reply']
+        return super().get_search_fields(view, request)
 
 class ChatListView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
@@ -320,22 +330,20 @@ class ChatListView(generics.ListAPIView):
     http_method_names = ["get"]
     serializer_class = ChatListSerializer
     pagination_class = StandardResultsSetPagination
-
+    filter_backends = [CustomSearchFilter, OrderingFilter]
+    ordering_fields = ["-time_stamp"]
+    search_fields = ["user_message", "bot_reply"]
+    
     def get_queryset(self):
         # Fitering against current user
         email_verified = self.request.user.email_verified
         token_verified = self.request.user.token_verified
         if not email_verified and not token_verified:
             return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        base_query = Chat.objects.filter(user=self.request.user)
-        self.chat_history_count = base_query.count()
-        user_message_query = self.request.query_params.get("user_message", None)
-        bot_reply_query = self.request.query_params.get("bot_reply", None)
-        if user_message_query:
-            base_query = base_query.filter(user_message__icontains=user_message_query).order_by("-time_stamp")
-        if bot_reply_query:
-            base_query = base_query.filter(bot_reply__icontains=bot_reply_query).order_by("-time_stamp")
+        base_query = Chat.objects.filter(user=self.request.user).order_by("-time_stamp")
+        date_time_query = self.request.query_params.get("time_stamp", None)
+        if date_time_query:
+            base_query = base_query.filter(time_stamp=date_time_query)
         return base_query
 
     def get(self, request, *args, **kwargs):
