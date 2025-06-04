@@ -335,6 +335,7 @@ class ContactView(FormView):
             if registered_user == "Yes" and not user_exist:
                 messages.error(request, message="This email has not be been registered, select No or create an account.")
                 return redirect(reverse_lazy("account:contact"))
+            
             if registered_user == "No" and user_exist:
                 messages.error(request, message="Account already exists, select Yes to continue.")
                 return redirect(reverse_lazy("account:contact"))
