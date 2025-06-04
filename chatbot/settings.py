@@ -133,7 +133,6 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ], 
     
-    # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

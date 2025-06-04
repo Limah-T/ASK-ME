@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You for Contacting AskME</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .email-wrapper {
+      background-color: #ffffff;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .header {
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      color: #007BFF;
+      margin: 0;
+    }
+    .content p {
+      line-height: 1.6;
+    }
+    .footer {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+      margin-top: 30px;
+    }
+    .highlight {
+      background-color: #f0f8ff;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <h1>Thank You, {{ name }}!</h1>
+    </div>
+    <div class="content">
+      <p>We’ve received your message and appreciate you taking the time to contact us.</p>
+      <p>Here’s a quick summary of your message:</p>
+      <div class="highlight">
+        <p><strong>Subject:</strong> {{ subject }}</p>
+        <p><strong>Your Message:</strong><br>{{ message }}</p>
+      </div>
+      <p>{{ feedback }}</p>
+      <p>Warm regards,<br><strong>The AskME Team</strong></p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2025 AskME — All rights reserved</p>
+    </div>
+  </div>
+</body>
+</html>

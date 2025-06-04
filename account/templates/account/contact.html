@@ -1,21 +1,41 @@
-{% extends 'base.html' %}
-{% block title %}Contact | ChatBotApp{% endblock %}
+{% extends 'account/base.html'%}
+{% load static %}
 
-{% block content %}
-  <h2>Contact Us</h2>
-  <form>
-    <div class="mb-3">
-      <label class="form-label">Name</label>
-      <input type="text" class="form-control" placeholder="Your name">
+{% block title %}Contact{% endblock %}
+{% block main %}
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card shadow-lg" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                        <form action="{% url 'account:contact' %}" method="POST">
+                            {% csrf_token %}
+                            {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                                    <p style="background-color: red; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% elif message.tags == 'success' %}
+                                    <p style="background-color: green; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% elif message.tags == 'info' %}
+                                    <p style="background-color: yellow; color: whitesmoke; text-align: center; font-size: 1rem;">{{message}}</p>
+                                {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                            {% for field in form %}
+                                <label for="{{ field.id_for_label }}" class="my-2">{{field.label}}</label> 
+                                {% if field.errors %}
+                                        <div class="text-danger small">
+                                            {{ field.errors.0 }}
+                                        </div>
+                                {% endif %}
+                                <p style="font-size: 1.2rem;">{{field}}</p>
+                            {% endfor %}
+                            <br>
+                            <button type="submit" class="w-100 btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-control" placeholder="you@example.com">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Message</label>
-      <textarea class="form-control" rows="4"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Send</button>
-  </form>
 {% endblock %}

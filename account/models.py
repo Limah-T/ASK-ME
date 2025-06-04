@@ -64,6 +64,26 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
+class Feedback(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="feedback")
+    subject = models.CharField(max_length=80, null=False, blank=False)
+    message = models.TextField(max_length=255, null=False, blank=False)
+    date = models.DateTimeField(auto_now_add=True)
+    reviewed = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.subject
+    
+class FeedbackReview(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="admin_review")
+    note = models.TextField(max_length=255, null=False, blank=False) 
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.note
+    
 class EmailOTP(Device):
     name = None
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

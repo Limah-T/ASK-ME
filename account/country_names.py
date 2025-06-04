@@ -196,3 +196,8 @@ COUNTRY_CHOICES = [
 
 DEFAULT_COUNTRY = "Nigeria"
 DEFAULT_ROLE = "user"
+
+REGISTERED_USER = [
+    ("Yes", "Yes"),
+    ("No", "No")
+]

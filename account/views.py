@@ -8,19 +8,23 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from dotenv import load_dotenv
-from .functions import send_token_for_email_verification, decode_token, send_token_for_password_reset
+from .functions import send_token_for_email_verification, decode_token, send_contact_message, send_token_for_password_reset, verify_email_from_kickbox
 from .country_names import DEFAULT_ROLE
-from .models import CustomUser, EmailOTP
+from .models import CustomUser, EmailOTP, Feedback
 from . import form
-from django.http import HttpResponse
-import os
 
 load_dotenv(override=True)
-
+    
 class SignUpView(FormView):
     template_name = "account/signup.html"
     form_class = form.SignupForm
     http_method_names = ["post", "get"]
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.error(request, message="You are already logged In, invalid request!")
+            return redirect(reverse_lazy("chat:chat")) 
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form_rendered = self.get_form(self.form_class)
@@ -28,6 +32,10 @@ class SignUpView(FormView):
             print(form_rendered.cleaned_data)
             username = form_rendered.cleaned_data.get("username")
             email = form_rendered.cleaned_data.get('email')
+            valid_email = verify_email_from_kickbox(email)
+            if valid_email.get("result") != "deliverable":
+                messages.error(request, message="Sorry, we couldn't verify your email address, make sure you input the correct email address.")
+                return redirect(reverse_lazy("account:signup"))
             user = form_rendered.save(commit=False)
             user.role = DEFAULT_ROLE
             user.save()
@@ -35,11 +43,17 @@ class SignUpView(FormView):
                 return render(request, "account/email_alert.html", {'username': username, 'email': email})
             messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
             CustomUser.objects.filter(email=email).delete()
-            # return render(request, "account/signup.html", {'form': form.SignupForm()})
         return super().post(request, *args, **kwargs)
     
 class VerifyEmailViaToken(View):
     http_method_names = ["get"]
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.error(request, message="Invalid request!")
+            return redirect(reverse_lazy("chat:chat")) 
+        return super().dispatch(request, *args, **kwargs)
+    
     def get(self, request, *args, **kwargs):
         token_input = request.GET.get('token')
         if not token_input:
@@ -63,6 +77,7 @@ class VerifyEmailViaToken(View):
         user.token_verified = True
         user.save()
         login(request, user=user)
+        messages.success(request, message="Successfully signed up")
         return redirect(reverse_lazy("chat:chat"))
     
 class LoginView(FormView):
@@ -70,18 +85,24 @@ class LoginView(FormView):
     form_class = form.LoginForm
     http_method_names = ['post', 'get']
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.token_verified:
+            messages.error(request, message="You are already logged In, invalid request!")
+            return redirect(reverse_lazy("chat:chat")) 
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         form_rendered = self.get_form(form_class=self.form_class)
         if form_rendered.is_valid():
             print(form_rendered.cleaned_data)
             email = form_rendered.cleaned_data.get('email')
             password = form_rendered.cleaned_data.get('password')
-            print(email, password)
-            if not request.user.is_anonymous:
-                request.user.token_verified = False
-                request.user.save()
-                logout(request)
-                print("logged user out")
+            if CustomUser.objects.filter(email=email).exists():   
+                user_exist = CustomUser.objects.get(email=email)
+                if not user_exist.email_verified:
+                    messages.error(request, message="Invalid email or password. Please try again.")
+                    return redirect(reverse_lazy("account:login"))
+            
             user = authenticate(request, email=email, password=password)            
             if not user:
                 messages.error(request, message="Email or password is incorrect!")
@@ -102,6 +123,12 @@ class VerifyOTP(FormView):
     template_name = "account/otp_input.html"
     form_class = form.OTPForm
     http_method_names = ['post', 'get']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.token_verified:
+            messages.error(request, message="You are already logged In, invalid request!")
+            return redirect(reverse_lazy("chat:chat")) 
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -138,6 +165,7 @@ class VerifyOTP(FormView):
                 EmailOTP.objects.filter(user=user).delete()
                 user.token_verified = True
                 user.save()
+                messages.success(request, message="You're logged In.")
                 return redirect(reverse_lazy("chat:chat"))
         return redirect(reverse_lazy("account:get_code", kwargs={'uid':user_id}))
        
@@ -146,12 +174,16 @@ class ForgetPasswordView(FormView):
     form_class = form.CustomForgetPasswordForm
     http_method_names = ['get', 'post']
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.error(request, message="You can perform such request while you are logged in!")
+            return redirect(reverse_lazy("chat:chat"))
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             email = form_rendered.cleaned_data.get('email')
-            print(email)
-            print(CustomUser.objects.values())
             try:
                 user_exist = CustomUser.objects.get(email=email)
                 user_exist.token_verified = False
@@ -164,6 +196,11 @@ class ForgetPasswordView(FormView):
         return super().post(request, *args, **kwargs)
 
 def verify_password_reset_link(request):
+    print(request.user)
+    if request.user.is_authenticated and request.user.token_verified:
+        messages.error(request, message="You can perform such request while you are logged in!")
+        return redirect(reverse_lazy("chat:chat"))
+    
     if request.method == 'GET':
         token = request.GET.get("token")
         print("token", token)
@@ -196,13 +233,21 @@ class ResetPasswordView(FormView):
     success_url = reverse_lazy("chat:chat")
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.error(request, message="You can perform such request while you are logged in!")
+            return redirect(reverse_lazy("chat:chat"))
+        
         try:
             print(kwargs['uid'])
             self.user = CustomUser.objects.get(id=kwargs['uid'])
+            print(self.user.email_verified, self.user.token_verified)
         except Exception as e:
             print("An error ocurred: ", e)
             return render(request, "account/failed_verification.html")
-        return super().dispatch(request, *args, **kwargs)
+        
+        if self.user.email_verified and self.user.token_verified:
+            return super().dispatch(request, *args, **kwargs)
+        return redirect(reverse_lazy("account:forget_password"))
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -230,6 +275,11 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
     template_name = "account/change_password.html"
     form_class = form.CustomChangePassword
     http_method_names = ['get', 'post']
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return redirect(reverse_lazy("home:home"))
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form_rendered = self.get_form(self.form_class)
@@ -260,3 +310,48 @@ def logoutView(request):
     logout(request)
     messages.success(request, message="Successfully logged out")
     return redirect(reverse_lazy("account:login"))
+
+class ContactView(FormView):
+    template_name = "account/contact.html"
+    form_class = form.ContactForm
+    http_method_names = ["get", "post"]
+    success_url = reverse_lazy("account:contact")
+
+    def post(self, request, *args, **kwargs):
+        form_rendered = self.get_form(self.form_class)
+        if form_rendered.is_valid():
+            name = form_rendered.cleaned_data.get("name")
+            email = form_rendered.cleaned_data.get("email")
+            registered_user = form_rendered.cleaned_data.get("registered_user")
+            subject = form_rendered.cleaned_data.get("subject")
+            message_recieved = form_rendered.cleaned_data.get("message")
+            user_exist = False
+            try:
+                user = CustomUser.objects.get(email=email)
+                user_exist = True
+            except Exception as e:
+                print(e)
+                user_exist = False
+            if registered_user == "Yes" and not user_exist:
+                messages.error(request, message="This email has not be been registered, select No or create an account.")
+                return redirect(reverse_lazy("account:contact"))
+            if registered_user == "No" and user_exist:
+                messages.error(request, message="Account already exists, select Yes to continue.")
+                return redirect(reverse_lazy("account:contact"))
+            if registered_user == "Yes" and user_exist:
+                if not user.email_verified and not user.token_verified:
+                    messages.error(request, message="This email has not be been verified, select No or create an account.")
+                    return redirect(reverse_lazy("account:contact")) 
+                if send_contact_message(email=user.email, name=name, sub=subject, message=message_recieved):
+                    messages.success(request, message="Your message has been sent. We will get back to you shortly. Thank you!")
+                    Feedback.objects.create(user=user, subject=subject, message=message_recieved)
+                    return redirect(reverse_lazy("account:contact")) 
+                messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
+                return redirect(reverse_lazy("account:contact"))
+            if registered_user == "No" and not user_exist:
+                if send_contact_message(email=email, name=name, sub=subject, message=message_recieved):
+                        messages.success(request, message="Your message has been sent. We will get back to you shortly. Thank you!")
+                        return redirect(reverse_lazy("account:contact")) 
+                messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
+                return redirect(reverse_lazy("account:contact"))
+        return super().post(request, *args, **kwargs)

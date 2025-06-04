@@ -15,15 +15,17 @@
           {% endif %}
       {% endfor %}
       {% endif %}
-    <div class="chat-header">
-      {{ user }}'s Bot Assistant
-      <a href="{% url 'account:change_password' %}">Change password</a>
+    <div class="chat-header d-flex justify-content-between align-items-center">
+      <div>{{ user }}'s bot assistant</div>
+      
     </div>
+
     <div id="chat-box" class="chat-box">
       {% for chat in chats %}
         {% if chat.user == user %}
-          <div class="chat-message user">{{ chat.user_message }}
-            <div class="chat-timestamp">you • {{ chat.created_at|timesince:chat.time_stamp }} ago</div>
+          <div class="chat-message user">
+            {{ chat.user_message }}
+            <div class="chat-timestamp">you • {{ chat.created_at|timesince }} ago</div>
           </div>
           <div class="chat-message bot">
             {% if forloop.last %}
@@ -31,7 +33,7 @@
             {% else %}
               {{ chat.bot_reply }}
             {% endif %}
-            <div class="chat-timestamp">bot • {{ chat.created_at|timesince:chat.time_stamp }} ago</div>
+            <div class="chat-timestamp">bot • {{ chat.created_at|timesince }} ago</div>
           </div>
         {% endif %}
       {% empty %}
