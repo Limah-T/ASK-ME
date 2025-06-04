@@ -55,25 +55,5 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-        ),
-        migrations.CreateModel(
-            name='Feedback',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('subject', models.CharField(max_length=80)),
-                ('message', models.TextField(max_length=255)),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('reviewed', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='feedback', to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='FeedbackReview',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('note', models.TextField(max_length=255)),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='admin_review', to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
+        )
     ]
