@@ -4,11 +4,11 @@ from account import views
 from django.contrib.auth.decorators import user_passes_test
 
 # Decorator to allow only superusers to access admin
-admin_view = user_passes_test(lambda u: u.is_superuser)(admin.site.admin_view(admin.site.get_urls()))
+admin.site.login = user_passes_test(lambda u: u.is_superuser)(admin.site.login)
 
 
 urlpatterns = [
-    path('admin/', admin_view, name="index"),
+    path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('account/', include('account.urls')),
     path('chat/', include('chat.urls')),
