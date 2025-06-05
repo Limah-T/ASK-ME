@@ -74,9 +74,7 @@ def wikipedia_api(user_question):
     import json
 
     url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": user_question,
-                          "num": 100
-                        })
+    payload = json.dumps({"q": user_question, "num": 100})
     headers = {
         'X-API-KEY': os.getenv("API_KEY"),
         'Content-Type': 'application/json'
@@ -86,14 +84,13 @@ def wikipedia_api(user_question):
         response = requests.post(url, headers=headers, data=payload)
         data = response.json()
 
-        # Extract snippets from top organic results (limit 3)
-        snippets = [item.get('snippet', '') for item in data.get('organic', [])[:3]]
-        summary = summarize_snippets(snippets)
+        # Get all snippets
+        snippets = [item.get('snippet', '') for item in data.get('organic', []) if item.get('snippet')]
 
-        if not summary:
+        if not snippets:
             return "Sorry, I couldn't find a clear answer. Could you please be more specific?"
 
-        return summary
+        return "\n\n".join(snippets)  # or "<br><br>".join(...) for HTML display
 
     except Exception as e:
         print(f"Error: {e}")
