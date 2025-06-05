@@ -288,14 +288,18 @@ class ChangePasswordView(LoginRequiredMixin, FormView):
             print(form_rendered.cleaned_data)
             old_password = form_rendered.cleaned_data.get('old_password')
             new_password = form_rendered.cleaned_data.get('new_password1')
+            new_password2 = form_rendered.cleaned_data.get('new_password2')
             confirm_old_password = authenticate(email=request.user.email, password=old_password)
             # checks if old password is correct
             if not confirm_old_password:
                 messages.error(request, message="Your old password is incorrect.")
+            elif new_password != new_password2:
+                messages.error(request, message="The new passwords do not match.")
             else:
                 same_old_password = authenticate(email=request.user.email, password=new_password)
                 if same_old_password:
                     messages.error(request, message="New password cannot be thesame as old password.")
+                
                 else:
                     request.user.password = make_password(password=new_password)
                     request.user.save()
