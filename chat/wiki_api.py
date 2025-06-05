@@ -48,24 +48,18 @@ load_dotenv(override=True)
     # return results
 import re
 
-def summarize_snippets(snippets, max_sentences=20):
-    # Collect sentences from snippets
-    sentences = []
-    for snippet in snippets:
-        # Split snippet into sentences using simple regex
-        sents = re.split(r'(?<=[.!?])\s+', snippet.strip())
-        for sent in sents:
-            # Clean sentence
-            clean_sent = sent.strip()
-            if clean_sent and clean_sent not in sentences:
-                sentences.append(clean_sent)
-            if len(sentences) >= max_sentences:
-                break
-        if len(sentences) >= max_sentences:
-            break
+def organize_snippets(snippets, max_results=100):
+    """Organize snippets into a nicely formatted numbered list."""
+    # Filter out any empty snippets
+    filtered_snippets = [s.strip() for s in snippets if s.strip()]
     
-    # Join selected sentences with space or line breaks
-    return " ".join(sentences)
+    # Limit to max_results items
+    bullet_list = []
+    for i, snippet in enumerate(filtered_snippets[:max_results], start=1):
+        bullet_list.append(f"{i}. {snippet}")
+    
+    # Join with two newlines between items for readability
+    return "\n\n".join(bullet_list)
 
 
 def wikipedia_api(user_question):
@@ -74,7 +68,12 @@ def wikipedia_api(user_question):
     import json
 
     url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": user_question, "num": 50})
+    # Use an environment variable to set the number of desired results; default to 100 if not set
+    num_results = int(os.getenv('NUMBER_OF_RESULTS', '100'))
+    payload = json.dumps({
+        "q": user_question,
+        "num": num_results
+    })
     headers = {
         'X-API-KEY': os.getenv("API_KEY"),
         'Content-Type': 'application/json'
@@ -84,18 +83,19 @@ def wikipedia_api(user_question):
         response = requests.post(url, headers=headers, data=payload)
         data = response.json()
 
-        # Get all snippets
-        snippets = [item.get('snippet', '') for item in data.get('organic', []) if item.get('snippet')]
-
+        # Extract snippets from all organic results (if available)
+        snippets = [item.get('snippet', '') for item in data.get('organic', [])]
+        
         if not snippets:
             return "Sorry, I couldn't find a clear answer. Could you please be more specific?"
 
-        return "\n\n".join(snippets)  # or "<br><br>".join(...) for HTML display
+        # Organize the snippets into a clean, readable list
+        organized_summary = organize_snippets(snippets, max_results=num_results)
+        return organized_summary
 
     except Exception as e:
         print(f"Error: {e}")
         return "Sorry, something went wrong. Can you ask something different or more specific?"
-
 
 def chatexchange(user_message):
     # Simulate bot reply (you can replace with real logic)
