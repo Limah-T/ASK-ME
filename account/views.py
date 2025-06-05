@@ -27,7 +27,6 @@ class SignUpView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        CustomUser.objects.all().delete()
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             print(form_rendered.cleaned_data)

@@ -48,7 +48,7 @@ load_dotenv(override=True)
     # return results
 import re
 
-def summarize_snippets(snippets, max_sentences=8):
+def summarize_snippets(snippets, max_sentences=20):
     # Collect sentences from snippets
     sentences = []
     for snippet in snippets:
@@ -74,7 +74,9 @@ def wikipedia_api(user_question):
     import json
 
     url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": user_question})
+    payload = json.dumps({"q": user_question,
+                          "num": 100
+                        })
     headers = {
         'X-API-KEY': os.getenv("API_KEY"),
         'Content-Type': 'application/json'
