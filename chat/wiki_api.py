@@ -74,7 +74,7 @@ def wikipedia_api(user_question):
     import json
 
     url = "https://google.serper.dev/search"
-    payload = json.dumps({"q": user_question, "num": 100})
+    payload = json.dumps({"q": user_question, "num": 50})
     headers = {
         'X-API-KEY': os.getenv("API_KEY"),
         'Content-Type': 'application/json'

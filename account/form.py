@@ -22,12 +22,23 @@ class SignupForm(UserCreationForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        cleaned_username = cleaned_data.get("username")
-        cleaned_email = cleaned_data.get("email")
-        print(cleaned_username, cleaned_email)
-        if cleaned_username and cleaned_email:
-            cleaned_data['username'] = cleaned_username.lower()
-            cleaned_data['email'] = cleaned_email.lower()
+        username = cleaned_data.get("username")
+        email = cleaned_data.get("email")
+
+        if username and email:
+            email = email.lower()
+            cleaned_data['username'] = username.lower()
+            cleaned_data['email'] = email
+
+            try:
+                user = CustomUser.objects.get(email=email)
+                if not user.email_verified:
+                    # Allow retry: delete the old unverified user
+                    user.delete()
+                else:
+                    raise forms.ValidationError("An account with this email already exists and is verified.")
+            except CustomUser.DoesNotExist:
+                pass  # No existing user, safe to proceed
         return cleaned_data
 
     class Meta:
