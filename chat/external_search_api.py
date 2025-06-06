@@ -7,7 +7,7 @@ def cohere_api(content):
 
     co = cohere.ClientV2(api_key=os.getenv("CO_API"))
     response = co.chat(
-        model=os.getenv("CO_MODEL_COMMAND "),
+        model=os.getenv("CO_MODEL_COMMAND"),
         messages=[
             {
                 "role": "user",
