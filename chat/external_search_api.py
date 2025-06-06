@@ -5,7 +5,7 @@ load_dotenv(override=True)
 import cohere, os
 def cohere_api(content):
 
-    co = cohere.ClientV2(api_key=os.getenv("CO_API"))
+    co = cohere.ClientV2(api_key=os.getenv("CO_API_KEY"))
     response = co.chat(
         model=os.getenv("CO_MODEL_COMMAND"),
         messages=[
