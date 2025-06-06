@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat
 from .form import QuestionNDbotReply
-from .external_search_api import action, wikipedia_api
+from .external_search_api import action
 import markdown
 
 class ChatBotView(LoginRequiredMixin, View):
