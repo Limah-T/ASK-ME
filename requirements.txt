@@ -10,4 +10,6 @@ psycopg2-binary==2.9.10
 whitenoise==6.9.0
 django-filter==25.1
 kickbox==2.0.4
+Markdown==3.8
+cohere==5.15.0
 

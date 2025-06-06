@@ -31,7 +31,7 @@
             {% if forloop.last %}
               <span id="botTyping" data-reply="{{ chat.bot_reply }}">Typing...</span>
             {% else %}
-              {{ chat.bot_reply }}
+              {{ chat.bot_reply|safe }}
             {% endif %}
             <div class="chat-timestamp">bot • {{ chat.created_at|timesince }} ago</div>
           </div>

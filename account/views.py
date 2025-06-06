@@ -27,6 +27,18 @@ class SignUpView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        email = request.POST.get('email').strip().lower()
+        username = request.POST.get('username').strip().lower()
+        print(email, username)
+        try:
+            user = CustomUser.objects.get(email=email)
+            if user.username == username:
+                if not user.email_verified:
+                    pass
+            # Allow retry: delete the old unverified user
+            user.delete()
+        except CustomUser.DoesNotExist:
+            pass  # No existing user, safe to proceed
         form_rendered = self.get_form(self.form_class)
         if form_rendered.is_valid():
             print(form_rendered.cleaned_data)
@@ -43,6 +55,7 @@ class SignUpView(FormView):
                 return render(request, "account/email_alert.html", {'username': username, 'email': email})
             messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
             CustomUser.objects.filter(email=email).delete()
+            return redirect(reverse_lazy("account:signup"))
         return super().post(request, *args, **kwargs)
     
 class VerifyEmailViaToken(View):
@@ -266,7 +279,7 @@ class ResetPasswordView(FormView):
             self.user.password = make_password(password=new_password)
             self.user.save()
             login(request, user=self.user)
-            messages.success(request, message="Password changed successfully.")
+            messages.success(request, message="Password has been successfully.")
             return redirect(reverse_lazy("chat:chat"))
         return super().post(request, *args, **kwargs)
     

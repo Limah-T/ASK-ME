@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer, GetNewTokenSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
-from chat.wiki_api import chatexchange
+from chat.external_search_api import action
 from chat.models import Chat
 import os
 load_dotenv()
@@ -292,7 +292,7 @@ class ChatCreateView(generics.CreateAPIView):
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_question = serializer.validated_data.get('question')
-        bot_reply = chatexchange(user_message=user_question)
+        bot_reply = action(user_message=user_question)
         exchange = Chat.objects.create(user=request.user, user_message=user_question,
                                        bot_reply=bot_reply)
         return Response(data={
@@ -455,7 +455,7 @@ class ChatUpdateView(generics.UpdateAPIView):
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         question = serializer.validated_data.get('question')
-        bot_reply = chatexchange(user_message=question)
+        bot_reply = action(user_message=question)
         chat_exists.user_message = question
         chat_exists.bot_reply = bot_reply
         chat_exists.save()
@@ -486,7 +486,7 @@ class ChatUpdateView(generics.UpdateAPIView):
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         question = serializer.validated_data.get('question')
-        bot_reply = chatexchange(user_message=question)
+        bot_reply = action(user_message=question)
         chat_exists.user_message = question
         chat_exists.bot_reply = bot_reply
         chat_exists.save()

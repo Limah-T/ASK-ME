@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat
 from .form import QuestionNDbotReply
-from .wiki_api import chatexchange
+from .external_search_api import action, wikipedia_api
+import markdown
 
 class ChatBotView(LoginRequiredMixin, View):
     template_name = "chat/chat.html"
@@ -20,8 +21,11 @@ class ChatBotView(LoginRequiredMixin, View):
         form = self.form_class(request.POST)
         if form.is_valid():
             user_message = form.cleaned_data.get("user_message")
+            # bot_reply_raw = wikipedia_api(user_message)
+            # Converts markdown to html
+            bot_reply_raw = action(user_message=user_message)
+            bot_reply = markdown.markdown(bot_reply_raw)
 
-            bot_reply = chatexchange(user_message=user_message)
             Chat.objects.create(user=request.user, user_message=user_message, bot_reply=bot_reply)
 
             return redirect("chat:chat") 
