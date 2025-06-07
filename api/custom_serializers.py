@@ -39,10 +39,7 @@ class SignUpSerializer(serializers.Serializer):
         email = validated_data.get('email')
         country = validated_data.get('country')
         password = validated_data.get('password')
-        if email == "limahenterprises152@gmail.com" and username == "limah":
-            user = CustomUser.objects.create_superuser(username=username, email=email, country=country)
-        else:
-            user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
+        user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
         return user
         
 class LoginSerializer(serializers.Serializer):
@@ -55,8 +52,10 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         try:
             user_exist = CustomUser.objects.get(email=data['email'])
-        except Exception as e:
-            raise serializers.ValidationError({'error': 'No user associated with this account'})
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
+        except Exception:
+            raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         if user_exist.token_verified:
                 raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
         user = authenticate(email=data['email'], password=data['password'])
