@@ -36,7 +36,6 @@ class SignUpView(views.APIView):
         length_of_data = len(request.data)
         if length_of_data > 4 or length_of_data < 4:
             return Response(data={'error': 'only \"username\", \"email\", \"country\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
-        CustomUser.objects.all().delete()
         try:
             user = CustomUser.objects.get(email=request.data.get("email").strip().lower())
             if  user.username == request.data.get("username").strip().lower():

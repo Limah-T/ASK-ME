@@ -41,7 +41,8 @@ class SignUpSerializer(serializers.Serializer):
         password = validated_data.get('password')
         if email == "limahenterprises152@gmail.com" and username == "limah":
             user = CustomUser.objects.create_superuser(username=username, email=email, country=country)
-        user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
+        else:
+            user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
         return user
         
 class LoginSerializer(serializers.Serializer):
