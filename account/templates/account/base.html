@@ -209,6 +209,59 @@
     }
   };
 </script>
+<script>
+  function toggleDropdown(el) {
+    const dropdown = el.nextElementSibling;
+
+    // Close other open dropdowns
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      if (menu !== dropdown) {
+        menu.style.display = 'none';
+      }
+    });
+
+    // Toggle visibility
+    if (dropdown.style.display === 'block') {
+      dropdown.style.display = 'none';
+    } else {
+      dropdown.style.display = 'block';
+    }
+  }
+
+  // Optional: close dropdown if clicked outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.chat-message')) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.style.display = 'none';
+      });
+    }
+  });
+</script>
+<script>
+  function timeAgo(datetime) {
+    const now = new Date();
+    const past = new Date(datetime);
+    const seconds = Math.floor((now - past) / 1000);
+
+    if (seconds < 60) return "just now";
+    if (seconds < 3600) return Math.floor(seconds / 60) + " mins ago";
+    if (seconds < 86400) return Math.floor(seconds / 3600) + " hrs ago";
+    return past.toLocaleDateString();
+  }
+
+  function updateTimestamps() {
+    document.querySelectorAll('.chat-timestamp').forEach(el => {
+      const timestamp = el.getAttribute('data-timestamp');
+      const timeAgoText = timeAgo(timestamp);
+      el.querySelector('.time-ago').textContent = timeAgoText;
+    });
+  }
+
+  // Initial call and interval refresh every 30 seconds
+  updateTimestamps();
+  setInterval(updateTimestamps, 30000);
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

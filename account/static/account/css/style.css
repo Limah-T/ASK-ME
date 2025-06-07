@@ -79,6 +79,7 @@
 }
 .chat-message.bot {
     background-color: #f1f1f1;
+    max-width: 80%;
     margin-right: auto;
     border-bottom-left-radius: 2px;
 }
@@ -107,3 +108,17 @@
     border-radius: 18px;
     margin-left: 1rem;
 }
+
+@media (max-width: 1024px) {
+    .chat-message.bot {
+      max-width: 100%;
+    }
+
+    .chat-message.user {
+        max-width: 80%;
+    }
+
+    .dropdown-toggle {
+      font-size: 1.2rem;
+    }
+  }

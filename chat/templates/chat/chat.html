@@ -23,19 +23,29 @@
     <div id="chat-box" class="chat-box">
       {% for chat in chats %}
         {% if chat.user == user %}
-          <div class="chat-message user">
+          <div class="chat-message user" style="position: relative;">
             {{ chat.user_message }}
-            <div class="chat-timestamp">you • {{ chat.created_at|timesince }} ago</div>
+            
+            <a href="#" class="dropdown-toggle" onclick="toggleDropdown(this)" style="float: right; color: whitesmoke; text-decoration: none;">••••</a>
+
+            <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 20px; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px; min-width: 80px; z-index: 1000;">
+              <a href="#" style="display: block; padding: 4px; color: black; text-decoration: none;">Edit</a>
+              <a href="{% url 'chat:chat-delete' pk=chat.id%}" style="display: block; padding: 4px; color: red; text-decoration: none;">Delete</a>
+            </div>
+
+            <div class="chat-timestamp" data-timestamp="{{ chat.created_at|date:'c' }}">you • <span class="time-ago"></span></div>
           </div>
+
           <div class="chat-message bot">
             {% if forloop.last %}
               <span id="botTyping" data-reply="{{ chat.bot_reply }}">Typing...</span>
             {% else %}
               {{ chat.bot_reply|safe }}
             {% endif %}
-            <div class="chat-timestamp">bot • {{ chat.created_at|timesince }} ago</div>
+            <div class="chat-timestamp" data-timestamp="{{ chat.created_at|date:'c' }}">bot • <span class="time-ago"></span></div>
           </div>
         {% endif %}
+
       {% empty %}
         <p>Welcome to your assistant chat</p>
       {% endfor %}
