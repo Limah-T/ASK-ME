@@ -62,7 +62,9 @@ class LoginSerializer(serializers.Serializer):
         except Exception as e:
             print(e)
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
+        print(data, 1)
         data['email'] = user.email
+        print(data, 2)
         return data
     
 class ForgetPasswordSerializer(serializers.Serializer):
