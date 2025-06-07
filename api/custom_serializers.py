@@ -58,13 +58,9 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            print(data, 1)
-            print(CustomUser.objects.values())
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         except Exception as e:
             print(e)
-            print(data, 2)
-            print(CustomUser.objects.values())
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         
         data['email'] = user.email 
