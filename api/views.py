@@ -106,6 +106,7 @@ class LoginView(views.APIView):
         print(serializer.validated_data)
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
+        print(CustomUser.objects.values())
         user = authenticate(request, email=email, password=password)
         print(user)
         if not user:   
