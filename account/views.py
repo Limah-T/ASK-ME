@@ -115,13 +115,15 @@ class LoginView(FormView):
                 if not user_exist.email_verified:
                     messages.error(request, message="Invalid email or password. Please try again.")
                     return redirect(reverse_lazy("account:login"))
-            
+            print(CustomUser.objects.values(), 1)
             user = authenticate(request, email=email, password=password)            
             if not user:
+                print(CustomUser.objects.values(), 2)
                 messages.error(request, message="Email or password is incorrect!")
             else:
                 user.token_verified=False
                 user.save()
+                print(CustomUser.objects.values(), 3)
                 # If user has any otp generated before now
                 EmailOTP.objects.filter(user=user).delete()
                 get_otp_for_user = EmailOTP.objects.create(user=user)
