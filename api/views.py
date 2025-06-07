@@ -39,9 +39,10 @@ class SignUpView(views.APIView):
         CustomUser.objects.all().delete()
         try:
             user = CustomUser.objects.get(email=request.data.get("email").strip().lower())
+            if  user.username == request.data.get("username").strip().lower():
+                pass
             if not user.email_verified:
-                if  user.username == request.data.get("username").strip().lower():
-                    pass
+                pass
             user.delete()
         except CustomUser.DoesNotExist:
             pass
