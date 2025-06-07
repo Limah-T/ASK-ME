@@ -102,7 +102,7 @@ class LoginView(views.APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         print(serializer.validated_data)
-        email = serializer.validated_data.get("email")
+        email = serializer.validated_data
         print(email)
         password = serializer.validated_data.get("password").strip()
         user = authenticate(request, email=email, password=password)
