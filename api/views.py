@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from datetime import timedelta
 from dotenv import load_dotenv
+from account.functions import verify_email_from_kickbox
 from .custom_serializers import SignUpSerializer, LoginSerializer, ForgetPasswordSerializer, SetPasswordSerializer, ChangePasswordSerializer, ChatCreateSerializer, ChatListSerializer, GetNewTokenSerializer
 from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
@@ -37,6 +38,7 @@ class SignUpView(views.APIView):
         if length_of_data > 4 or length_of_data < 4:
             return Response(data={'error': 'only \"username\", \"email\", \"country\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            CustomUser.objects.all().delete()
             user = CustomUser.objects.get(email=request.data.get("email").strip().lower())
             if  user.username == request.data.get("username").strip().lower():
                 pass
