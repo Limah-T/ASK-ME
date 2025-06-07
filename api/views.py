@@ -367,7 +367,7 @@ class ChatListView(generics.ListAPIView):
         date_time_query = self.request.query_params.get("time_stamp", None)
         if date_time_query:
             base_query = base_query.filter(time_stamp=date_time_query)
-        return markdown.markdown(base_query)
+        return base_query
 
     def get(self, request, *args, **kwargs):
         email_verified = request.user.email_verified
