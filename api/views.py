@@ -317,9 +317,10 @@ class ChatCreateView(generics.CreateAPIView):
         bot_reply = markdown.markdown(bot_reply_raw)
         exchange = Chat.objects.create(user=request.user, user_message=user_question,
                                        bot_reply=html.escape(bot_reply))
+        print(html.escape(bot_reply))
         return Response(data={
                         'you': user_question,
-                        'bot': bot_reply,
+                        'bot': html.escape(bot_reply),
                         'time': exchange.time_stamp
                         }, status=status.HTTP_200_OK
                 )
