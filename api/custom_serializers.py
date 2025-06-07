@@ -56,12 +56,13 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         email = data['email']
         try:
-            CustomUser.objects.get(email=email)
+            user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         except Exception as e:
             print(e)
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
+        data['email'] = user.email
         return data
     
 class ForgetPasswordSerializer(serializers.Serializer):
