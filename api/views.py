@@ -34,6 +34,7 @@ class SignUpView(views.APIView):
     http_method_names = ['post']
 
     def post(self, request):
+        CustomUser.objects.all().delete()
         length_of_data = len(request.data)
         if length_of_data > 4 or length_of_data < 4:
             return Response(data={'error': 'only \"username\", \"email\", \"country\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
