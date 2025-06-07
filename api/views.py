@@ -20,7 +20,7 @@ from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 from chat.external_search_api import action
 from chat.models import Chat
-import os, markdown
+import os, markdown, html
 load_dotenv()
 
 def customexceptionhandler(request, exception):
@@ -316,7 +316,7 @@ class ChatCreateView(generics.CreateAPIView):
         bot_reply_raw = action(user_message=user_question)
         bot_reply = markdown.markdown(bot_reply_raw)
         exchange = Chat.objects.create(user=request.user, user_message=user_question,
-                                       bot_reply=bot_reply)
+                                       bot_reply=html.escape(bot_reply))
         return Response(data={
                         'you': user_question,
                         'bot': bot_reply,
