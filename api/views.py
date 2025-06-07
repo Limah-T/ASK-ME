@@ -104,7 +104,8 @@ class LoginView(views.APIView):
         print(serializer.validated_data)
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(email=email, password=password)
+        print(user)
         if not user:   
             return Response(data={'error': 'Email or password is incorrect, pass.'}, status=status.HTTP_400_BAD_REQUEST)
         if not user.email_verified:
