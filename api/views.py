@@ -314,13 +314,13 @@ class ChatCreateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user_question = serializer.validated_data.get('question')
         bot_reply_raw = action(user_message=user_question)
-        bot_reply = markdown.markdown(bot_reply_raw)
+        bot_reply = markdown.markdown(bot_reply_raw, extensions=["extra"])
         exchange = Chat.objects.create(user=request.user, user_message=user_question,
-                                       bot_reply=html.escape(bot_reply))
-        print(html.escape(bot_reply))
+                                       bot_reply=bot_reply)
+        print(bot_reply)
         return Response(data={
                         'you': user_question,
-                        'bot': html.escape(bot_reply),
+                        'bot': bot_reply,
                         'time': exchange.time_stamp
                         }, status=status.HTTP_200_OK
                 )
