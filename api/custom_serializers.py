@@ -39,11 +39,7 @@ class SignUpSerializer(serializers.Serializer):
         email = validated_data.get('email')
         country = validated_data.get('country')
         password = validated_data.get('password')
-        print(email, password)
-        if email == "limahenterprises152@gmail.com":
-            user=CustomUser.objects.create_superuser(username=username, email=email, country=country, password=password)
-        else:
-            user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
+        user = CustomUser.objects.create_user(username=username, email=email, country=country, role=DEFAULT_ROLE, password=password)
         return user
         
 class LoginSerializer(serializers.Serializer):
@@ -73,12 +69,14 @@ class ForgetPasswordSerializer(serializers.Serializer):
         try:
             user = CustomUser.objects.get(email=value.lower())
         except CustomUser.DoesNotExist:
-            raise serializers.ValidationError({"error": "Email does not exist!"})
+            raise serializers.ValidationError({"error": "Incorrect email, are you sure you enter the correct email address."})
         except CustomUser.MultipleObjectsReturned:
             raise serializers.ValidationError({'error':'Multiple account found for this user.'})
         except Exception as e:
             print(e)
             raise serializers.ValidationError({"error": "An error occured try again later."})
+        if not user.email_verified:
+            raise serializers.ValidationError({"error": "Incorrect email, are you sure you enter the correct email address."})
         user.token_verified = False
         user.save()
         return value
@@ -97,12 +95,12 @@ class SetPasswordSerializer(serializers.Serializer):
         try:
             user = CustomUser.objects.get(email=data['email'])
         except CustomUser.DoesNotExist:
-            raise serializers.ValidationError({"error": "Email does not exist!"})
+            raise serializers.ValidationError({"error": "Incorrect email, are you sure you enter the correct email address."})
         except CustomUser.MultipleObjectsReturned:
-            raise serializers.ValidationError({'error':'Multiple account found for this user.'})
+            raise serializers.ValidationError({"error": "Incorrect email, are you sure you enter the correct email address."})
         except Exception as e:
             print(e)
-            raise serializers.ValidationError({"error": "An error occured try again later."})
+            raise serializers.ValidationError({"error": "Incorrect email, are you sure you enter the correct email address."})
         if not user.reset_token:
             raise serializers.ValidationError({'error': 'Invalid attempt due to time out or no token generated, request a token before resetting password.'})
         if not timezone.now() > user.time_token_set:
