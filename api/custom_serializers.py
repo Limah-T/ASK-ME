@@ -50,13 +50,15 @@ class LoginSerializer(serializers.Serializer):
         return value.lower()
 
     def validate(self, data):
+        email = data['email'].strip()
+        password = data['password'].strip()
         try:
-            user_exist = CustomUser.objects.get(email=data['email'])
+            user_exist = CustomUser.objects.get(email=email.lower())
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         except Exception:
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
-        user = authenticate(email=data['email'], password=data['password'])
+        user = authenticate(email=email.lower(), password=password)
         if not user:   
             raise serializers.ValidationError({'error': 'Email or password is incorrect, pass.'})
         if not user.email_verified:
