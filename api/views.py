@@ -20,7 +20,7 @@ from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 from chat.external_search_api import action
 from chat.models import Chat
-import os
+import os, markdown
 load_dotenv()
 
 def customexceptionhandler(request, exception):
@@ -271,7 +271,7 @@ class ChangePasswordView(views.APIView):
         new_password = serializer.validated_data.get('new_password')
         user = request.user
         if not authenticate(email=user.email, password=old_password):
-            return Response(data={'error': 'Recent password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'old password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
         if authenticate(email=user.email, password=new_password):
             return Response(data={'error': 'New password is too similar to the old password.'}, status=status.HTTP_400_BAD_REQUEST)
         user.password = make_password(password=new_password)
@@ -308,12 +308,13 @@ class ChatCreateView(generics.CreateAPIView):
         email_verified = request.user.email_verified
         token_verified = request.user.token_verified
         if not email_verified and not token_verified:
-            return Response(data={'error': 'Invalid request, user\'s email has not been verified'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"error": "Incorrect email, are you sure you enter the correct email address."}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = ChatCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_question = serializer.validated_data.get('question')
-        bot_reply = action(user_message=user_question)
+        bot_reply_raw = action(user_message=user_question)
+        bot_reply = markdown.markdown(bot_reply_raw)
         exchange = Chat.objects.create(user=request.user, user_message=user_question,
                                        bot_reply=bot_reply)
         return Response(data={
@@ -365,7 +366,7 @@ class ChatListView(generics.ListAPIView):
         date_time_query = self.request.query_params.get("time_stamp", None)
         if date_time_query:
             base_query = base_query.filter(time_stamp=date_time_query)
-        return base_query
+        return markdown.markdown(base_query)
 
     def get(self, request, *args, **kwargs):
         email_verified = request.user.email_verified
