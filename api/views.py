@@ -37,11 +37,19 @@ class SignUpView(views.APIView):
         if length_of_data > 4 or length_of_data < 4:
             return Response(data={'error': 'only \"username\", \"email\", \"country\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
         CustomUser.objects.all().delete()
+        try:
+            user = CustomUser.objects.get(email=request.data.get("email").strip().lower())
+            if not user.email_verified:
+                if  user.username == request.data.get("username").strip().lower():
+                    pass
+            user.delete()
+        except CustomUser.DoesNotExist:
+            pass
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if send_token_for_email_verification(user=user.email):
-            return Response(data={'message': 'Registration successful. Please check your email to verify your account.'}, status=status.HTTP_200_OK)
+            return Response(data={'message': ' If this email is registered, you’ll receive further instructions shortly for verification.'}, status=status.HTTP_200_OK)
         return Response(data={'error': 'Error occured while sending for verification.'}, status=status.HTTP_400_BAD_REQUEST)
     
 class VerifyEmailView(views.APIView):
