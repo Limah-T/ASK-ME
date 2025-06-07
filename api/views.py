@@ -128,20 +128,20 @@ class VerifyOtpView(views.APIView):
             return Response(data={'error': 'Email and code are required.'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            user = CustomUser.objects.get(email=email.strip())
+            user = CustomUser.objects.get(email=email.strip().lower())
         except CustomUser.DoesNotExist:
-            return Response(data={'error': 'User with this account does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Invalid request, are you sure you enter the correct email?'}, status=status.HTTP_400_BAD_REQUEST)
         except CustomUser.MultipleObjectsReturned:
-            return Response(data={'error':'Multiple account found with this email.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error':'Invalid request, are you sure you enter the correct email?'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
-            return Response(data={'error': 'An error occurred when verifying this account.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Invalid request, are you sure you enter the correct email?'}, status=status.HTTP_400_BAD_REQUEST)
         
         if not user.email_verified:
-            return Response(data={'error': 'User with the account does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Invalid request, are you sure you enter the correct email?'}, status=status.HTTP_400_BAD_REQUEST)
         
         if user.token_verified:
-            return Response(data={'error': 'User code has been verified before now'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'error': 'Invalid Code!'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not EmailOTP.objects.filter(user=user).exists():
             return Response(data={'error': 'No code generated for this user yet.'}, status=status.HTTP_400_BAD_REQUEST)

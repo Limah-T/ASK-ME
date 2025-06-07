@@ -56,11 +56,14 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
         except Exception:
             raise serializers.ValidationError({'error': 'Email or password is incorrect!'})
-        if user_exist.token_verified:
-                raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
         user = authenticate(email=data['email'], password=data['password'])
         if not user: 
             raise serializers.ValidationError({'error': 'Email or password is incorrect.'})
+        if not user.email_verified:
+            raise serializers.ValidationError({'error': 'Email or password is incorrect'})
+        if user_exist.token_verified:
+            raise serializers.ValidationError({'error': 'Invalid request, user is logged in already.'})
+
         return user
     
 class ForgetPasswordSerializer(serializers.Serializer):
