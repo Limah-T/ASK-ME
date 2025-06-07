@@ -34,7 +34,6 @@ class SignUpView(views.APIView):
     http_method_names = ['post']
 
     def post(self, request):
-        CustomUser.objects.all().delete()
         length_of_data = len(request.data)
         if length_of_data > 4 or length_of_data < 4:
             return Response(data={'error': 'only \"username\", \"email\", \"country\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -161,7 +160,7 @@ class VerifyOtpView(views.APIView):
         if not EmailOTP.objects.filter(user=user).exists():
             return Response(data={'error': 'No code generated for this user yet.'}, status=status.HTTP_400_BAD_REQUEST)
         user_code = EmailOTP.objects.get(user=user)
-        if code != user_code.otp_code:
+        if code.strip() != user_code.otp_code:
             return Response(data={'error': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
         if not user_code.verify_otp():
             return Response(data={'error': 'Code has expired.'}, status=status.HTTP_400_BAD_REQUEST)
