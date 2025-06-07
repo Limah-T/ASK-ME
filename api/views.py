@@ -99,9 +99,19 @@ class LoginView(views.APIView):
         length_of_data = len(request.data)
         if length_of_data > 2 or length_of_data < 2:
             return Response(data={'error': 'only  \"email\", and \"password\" are required'}, status=status.HTTP_400_BAD_REQUEST)
+        print(CustomUser.objects.all())
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
+        email = serializer.validated_data.get("email")
+        password = serializer.validated_data.get("password").strip()
+        user = authenticate(request, email=email, password=password)
+        if not user:   
+            return Response(data={'error': 'Email or password is incorrect, pass.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not user.email_verified:
+            return Response(data={'error': 'Email or password is incorrect, verify'})
+        if user.token_verified:
+            return Response(data={'error': 'Invalid request, user is logged in already.'})
+
         if EmailOTP.objects.filter(user=user).exists():
             EmailOTP.objects.filter(user=user).delete()
         get_otp = EmailOTP.objects.create(user=user)
