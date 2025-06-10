@@ -54,8 +54,10 @@ class SignUpView(FormView):
             user = form_rendered.save(commit=False)
             user.role = DEFAULT_ROLE
             user.save()
-            if send_token_for_email_verification(email):
+            if send_token_for_email_verification(user.email):
+                print("Here")
                 return render(request, "account/email_alert.html", {'username': username, 'email': email})
+            print("Now here")
             messages.error(request, message="Sorry, couldn't send for verification due to network issue or invalid credential such as email, make sure you enter the valid credential or try again later.")
             CustomUser.objects.filter(email=email).delete()
         return redirect(reverse_lazy("account:signup"))
