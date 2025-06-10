@@ -8,15 +8,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from dotenv import load_dotenv
-from .functions import send_token_for_email_verification, decode_token, send_contact_message, send_token_for_password_reset, verify_email_from_kickbox
+from .functions import send_token_for_email_verification, decode_token, send_contact_message, send_token_for_password_reset 
+# verify_email_from_kickbox
 from .country_names import DEFAULT_ROLE
 from .models import CustomUser, EmailOTP, Feedback
 from . import form
 
 load_dotenv(override=True)
-
-# def custom_permission_denied_view(request, exception):
-#     return render(request, '403.html', status=403)
     
 class SignUpView(FormView):
     template_name = "account/signup.html"
@@ -111,7 +109,6 @@ class LoginView(FormView):
     def post(self, request, *args, **kwargs):
         form_rendered = self.get_form(form_class=self.form_class)
         if form_rendered.is_valid():
-            print(form_rendered.cleaned_data)
             email = form_rendered.cleaned_data.get('email')
             password = form_rendered.cleaned_data.get('password')
             if CustomUser.objects.filter(email=email).exists():   
@@ -119,15 +116,12 @@ class LoginView(FormView):
                 if not user_exist.email_verified:
                     messages.error(request, message="Invalid email or password. Please try again.")
                     return redirect(reverse_lazy("account:login"))
-            print(CustomUser.objects.values(), 1)
             user = authenticate(request, email=email, password=password)            
             if not user:
-                print(CustomUser.objects.values(), 2)
                 messages.error(request, message="Email or password is incorrect!")
             else:
                 user.token_verified=False
                 user.save()
-                print(CustomUser.objects.values(), 3)
                 # If user has any otp generated before now
                 EmailOTP.objects.filter(user=user).delete()
                 get_otp_for_user = EmailOTP.objects.create(user=user)

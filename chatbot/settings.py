@@ -9,7 +9,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('TOP_KEY')
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
-# DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ask-me-4j4v.onrender.com"]
 
@@ -154,3 +153,5 @@ SESSION_COOKIE_HTTPONLY = True  # Prevent JS from accessing session cookie
 
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
 SECURE_REFERRER_POLICY = 'same-origin'  # Control referer headers
+
+SESSION_COOKIE_AGE = 3600

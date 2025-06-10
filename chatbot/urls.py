@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
 ]
 
-handler404 = 'api.views.customexceptionhandler'
-# handler403 = "account.views.custom_permission_denied_view"
+handler404 = 'api.views.custom_exception_handler_404'
+handler403 = 'api.views.custom_exception_handler_403'
+handler500 = 'api.views.custom_exception_handler_500'

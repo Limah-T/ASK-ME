@@ -36,33 +36,33 @@ class ChatBotView(LoginRequiredMixin, View):
         chats = Chat.objects.order_by("time_stamp")
         return render(request, self.template_name, {"form": form, "chats": chats})
     
+# @login_required
+# def chat_update_view(request, pk):
+#     chat = get_object_or_404(Chat, id=pk)
+#     if request.method != "POST":
+#         messages.error(request, "Invalid request method.")
+#         return redirect("home:home") 
+#     # Only the chat owner should be allowed to update
+#     if chat.user != request.user:
+#         messages.error(request, "You are not authorized to update this chat.")
+#         return redirect("home:home")  
 
-@login_required
-def chat_update_view(request, pk):
-    chat = get_object_or_404(Chat, id=pk)
+#     form = QuestionNDbotReply(request.POST)
+#     if form.is_valid():
+#         form.save()
+#         messages.success(request, "Chat updated successfully.")
+#     else:
+#         form = QuestionNDbotReply(instance=chat)
 
-    # Only the chat owner should be allowed to update
-    if chat.user != request.user:
-        messages.error(request, "You are not authorized to update this chat.")
-        return redirect("chat-page")  # Replace with your actual chat page name
-
-    # if request.method == "POST":
-    form = QuestionNDbotReply(request.POST, instance=chat)
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Chat updated successfully.")
-    else:
-        form = QuestionNDbotReply(instance=chat)
-
-    chats = Chat.objects.order_by("time_stamp")
-    return render(request, "chat/chat.html", {"form": form, "chats": chats})
+#     chats = Chat.objects.order_by("time_stamp")
+#     return render(request, "chat/chat.html", {"form": form, "chats": chats})
 
 @login_required(login_url=settings.LOGIN_URL)
 def chat_delete_view(request, pk):
     current_user = request.user
-    # if request.method != "POST":
-    #     messages.error(request, "Invalid request method.")
-    #     return redirect("home:home")  # Replace with your actual chat page name
+    if request.method != "POST":
+        messages.error(request, "Invalid request method.")
+        return redirect("home:home")  
     try:
         chat = Chat.objects.get(id=pk)
         chat_owner = chat.user

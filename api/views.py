@@ -20,13 +20,23 @@ from account.models import CustomUser, EmailOTP
 from .sendout import send_token_for_email_verification, decode_token, send_token_for_password_reset
 from chat.external_search_api import action
 from chat.models import Chat
-import os, markdown, html
+import os, markdown
 load_dotenv()
 
-def customexceptionhandler(request, exception):
+def custom_exception_handler_404(request, exception):
     if request.path.startswith('/api/'):
-        return JsonResponse({'detail': 'Not found'}, status=400)
+        return JsonResponse({'detail': 'Not found'}, status=404)
     return render(request, '404.html', status=404)
+
+def custom_exception_handler_403(request, exception):
+    if request.path.startswith('/api/'):
+        return JsonResponse({'detail': 'Not found'}, status=403)
+    return render(request, '500.html', status=403)
+
+def custom_exception_handler_500(request):
+    if request.path.startswith('/api/'):
+        return JsonResponse({'detail': 'Not found'}, status=500)
+    return render(request, '500.html', status=500)
 
 class SignUpView(views.APIView):
     authentication_classes = []
