@@ -168,8 +168,8 @@ def send_contact_message(email, name, sub, message):
                         )
     msg = EmailMultiAlternatives(
         subject=sub,
-        from_email=os.getenv("EMAIL_HOST_USER"),
-        to=[email]
+        from_email=email,
+        to=[os.getenv("EMAIL_HOST_USER")]
     )
     msg.attach_alternative(content=html_content, mimetype="text/html")
 
