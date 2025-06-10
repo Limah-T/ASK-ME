@@ -1,0 +1,19 @@
+{% extends 'account/base.html' %}
+{% load static %}
+
+{% block title %}Internal Server Error{% endblock %}
+{% block main %}
+    <div class="container text-center">
+        <div class="row justify-content-center align-items-center" style="height: 100vh;">
+            <div class="col-12 col-md-6">
+                <div class="card shadow-lg p-4">
+                    <h1 class="display-4 text-danger">500</h1>
+                    <h2>Internal Server Error</h2>
+                    <p class="lead">Something went wrong on our end. We're working on it!</p>
+                    <p>Feel free to <a href="{% url 'home:home' %}">return to the homepage</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer %}{% endblock %}

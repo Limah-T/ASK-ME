@@ -1,0 +1,21 @@
+{% extends 'account/base.html' %}
+{% load static %}
+
+{% block title %}Forbidden - Access Denied{% endblock %}
+{% block main %}
+
+    <div class="container text-center">
+        <div class="row justify-content-center align-items-center" style="height: 100vh;">
+            <div class="col-12 col-md-6">
+                <div class="card shadow-lg p-4">
+                    <h1 class="display-4 text-danger">403</h1>
+                    <h2>Forbidden</h2>
+                    <p class="lead">Oops! You don't have permission to view this page.</p>
+                    <p>Please <a href="{% url 'account:login'%}">log in </a>to continue, or go back to the <a href="{% url 'home:home' %}">homepage.</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block footer %}{% endblock %}
