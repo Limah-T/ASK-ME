@@ -14,6 +14,9 @@ from .models import CustomUser, EmailOTP, Feedback
 from . import form
 
 load_dotenv(override=True)
+
+# def custom_permission_denied_view(request, exception):
+#     return render(request, '403.html', status=403)
     
 class SignUpView(FormView):
     template_name = "account/signup.html"

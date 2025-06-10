@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-from account import views
 from django.contrib.auth.decorators import user_passes_test
 
 # Decorator to allow only superusers to access admin
@@ -16,4 +15,4 @@ urlpatterns = [
 ]
 
 handler404 = 'api.views.customexceptionhandler'
-
+# handler403 = "account.views.custom_permission_denied_view"
