@@ -47,10 +47,10 @@ class SignUpView(FormView):
             print(form_rendered.cleaned_data)
             username = form_rendered.cleaned_data.get("username")
             email = form_rendered.cleaned_data.get('email')
-            valid_email = verify_email_from_kickbox(email)
-            if valid_email.get("result") != "deliverable":
-                messages.error(request, message="Sorry, we couldn't verify your email address, make sure you input the correct email address.")
-                return redirect(reverse_lazy("account:signup"))
+            # valid_email = verify_email_from_kickbox(email)
+            # if valid_email.get("result") != "deliverable":
+            #     messages.error(request, message="Sorry, we couldn't verify your email address, make sure you input the correct email address.")
+            #     return redirect(reverse_lazy("account:signup"))
             user = form_rendered.save(commit=False)
             user.role = DEFAULT_ROLE
             user.save()
