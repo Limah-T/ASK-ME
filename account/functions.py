@@ -166,11 +166,13 @@ def send_contact_message(email, name, sub, message):
                                 "message": message
                             }
                         )
+
     msg = EmailMultiAlternatives(
-        subject=sub,
-        from_email=email,
-        to=[os.getenv("EMAIL_HOST_USER")]
-    )
+        subject=f"Contact Form: {sub}",
+        from_email=os.getenv("EMAIL_HOST_USER"),  # ther verified sender
+        to=[os.getenv("EMAIL_HOST_USER")],        # to the developer
+        reply_to=[email]  # user’s email in Reply-To header
+)
     msg.attach_alternative(content=html_content, mimetype="text/html")
 
     try:
