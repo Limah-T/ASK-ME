@@ -192,7 +192,7 @@ def send_contact_message(email, name, sub, message):
         print("Sender address was refused by the server.")
         return None
     except SMTPDataError as e:
-        print(f"SMTPDataError: {e.smtp_code} - {e.smtp_error.decode()}"
+        print(f"SMTPDataError: {e.smtp_code} - {e.smtp_error.decode()}")
         return None
     except SMTPException as e:
         print(f"SMTP error occurred: {e}")
