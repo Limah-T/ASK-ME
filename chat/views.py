@@ -59,10 +59,7 @@ class ChatBotView(LoginRequiredMixin, View):
 
 @login_required(login_url=settings.LOGIN_URL)
 def chat_delete_view(request, pk):
-    current_user = request.user
-    if request.method != "POST":
-        messages.error(request, "Invalid request method.")
-        return redirect("home:home")  
+    current_user = request.user 
     try:
         chat = Chat.objects.get(id=pk)
         chat_owner = chat.user

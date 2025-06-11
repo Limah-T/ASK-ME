@@ -28,7 +28,7 @@ source env/bin/activate  # or env\Scripts\activate on Windows
 pip install -r requirements.txt (check the requirements.txt file)
 
 📍 API Endpoints (Overview)
-# Endpoint                                Method     Action
+# Endpoint                              Method     Action
 /api/v1/signup/	                        POST	   Register new user.
 /api/v1/verify-email?token=token        GET        Verifies email via Token.
 /api/v1/login/                          POST       Login with valid credentials.
